@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Application
-    x:Class="FoodStreetGuide.App"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:helpers="clr-namespace:FoodStreetGuide.Helpers">
-
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FoodStreetMAUI.App">
     <Application.Resources>
         <ResourceDictionary>
-
-            <!-- ── Value Converters (app-wide) ── -->
-            <helpers:BoolToColorConverter       x:Key="BoolToColor"/>
-            <helpers:BoolToTourLabelConverter   x:Key="BoolToTourLabel"/>
-            <helpers:BoolToGreenRedConverter    x:Key="BoolToGreenRed"/>
-            <helpers:LanguageToColorConverter   x:Key="LangToColor"/>
-            <helpers:TabColorConverter          x:Key="TabColor"/>
-            <helpers:TabVisibleConverter        x:Key="TabVisible"/>
-            <helpers:GeofenceStateToColorConverter x:Key="GeoStateColor"/>
-
+            <Color x:Key="Primary">#F0A030</Color>
+            <Color x:Key="PrimaryDark">#C07820</Color>
+            <Color x:Key="Background">#0F0F16</Color>
+            <Color x:Key="Surface">#1A1A26</Color>
+            <Color x:Key="OnSurface">#E0E0F0</Color>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

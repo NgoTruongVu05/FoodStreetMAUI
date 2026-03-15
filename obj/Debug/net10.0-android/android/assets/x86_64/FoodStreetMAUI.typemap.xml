@@ -1,0 +1,10 @@
+<api type="debug" assembly-name="FoodStreetMAUI" mvid="fe13449682fe483d9729df8bba655b5f">
+  <java-to-managed>
+    <entry java-name="crc6433d11a29349ca581/MainActivity" managed-name="FoodStreetMAUI.Platforms.Android.MainActivity, FoodStreetMAUI" managed-type-token-id="33554451" />
+    <entry java-name="crc6433d11a29349ca581/MainApplication" managed-name="FoodStreetMAUI.Platforms.Android.MainApplication, FoodStreetMAUI" managed-type-token-id="33554452" />
+  </java-to-managed>
+  <managed-to-java>
+    <entry java-name="crc6433d11a29349ca581/MainActivity" managed-name="FoodStreetMAUI.Platforms.Android.MainActivity, FoodStreetMAUI" managed-type-token-id="33554451" />
+    <entry java-name="crc6433d11a29349ca581/MainApplication" managed-name="FoodStreetMAUI.Platforms.Android.MainApplication, FoodStreetMAUI" managed-type-token-id="33554452" />
+  </managed-to-java>
+</api>

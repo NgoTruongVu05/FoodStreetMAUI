@@ -1,138 +1,160 @@
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using FoodStreetGuide.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using FoodStreetMAUI.Models;
 using Microsoft.Maui.Devices.Sensors;
 
-namespace FoodStreetGuide.Services;
-
-/// <summary>
-/// GPS service dùng MAUI Essentials Geolocation.
-/// Tự động chuyển Foreground ↔ Background khi app lifecycle thay đổi.
-/// </summary>
-public sealed class GpsService : IGpsService
+namespace FoodStreetMAUI.Services
 {
-    // ── Reactive stream ──────────────────────────────────────────────
-    private readonly Subject<GeoLocation> _locationSubject = new();
-    private CancellationTokenSource?      _cts;
-    private Task?                         _trackingTask;
-
-    // ── State ────────────────────────────────────────────────────────
-    public GeoLocation?       CurrentLocation { get; private set; }
-    public GpsTrackingConfig  Config          { get; private set; } = GpsTrackingConfig.Foreground;
-    public bool               IsTracking      { get; private set; }
-
-    public IObservable<GeoLocation> LocationUpdates =>
-        _locationSubject.AsObservable();
-
-    // ── Permission ───────────────────────────────────────────────────
-    public async Task<bool> RequestPermissionsAsync()
+    public class GpsUpdateEventArgs : EventArgs
     {
-        var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-        if (status != PermissionStatus.Granted) return false;
-
-        // Yêu cầu thêm background (Android 10+)
-        if (DeviceInfo.Platform == DevicePlatform.Android)
-        {
-            status = await Permissions.RequestAsync<Permissions.LocationAlways>();
-        }
-
-        return status == PermissionStatus.Granted;
+        public GpsCoordinate Location { get; }
+        public GpsUpdateEventArgs(GpsCoordinate loc) => Location = loc;
     }
 
-    // ── Start / Stop ─────────────────────────────────────────────────
-    public async Task StartAsync(GpsTrackingConfig config, CancellationToken ct = default)
+    public partial class GpsService : IDisposable
     {
-        if (IsTracking) await StopAsync();
+        public event EventHandler<GpsUpdateEventArgs>? LocationUpdated;
+        public event EventHandler<string>? StatusChanged;
 
-        Config = config;
-        _cts   = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        IsTracking = true;
+        public GpsCoordinate? CurrentLocation { get; private set; }
+        public bool IsTracking { get; private set; }
+        public bool IsSimulating { get; private set; }
+        public double TotalDistance { get; private set; }
 
-        // Lấy vị trí đầu tiên ngay lập tức
-        await FetchOnceAsync();
+        public int UpdateIntervalMs { get; set; } = 2000;
 
-        // Bắt đầu polling loop
-        _trackingTask = RunTrackingLoopAsync(_cts.Token);
-    }
+        private CancellationTokenSource? _cts;
+        private GpsCoordinate? _lastLocation;
 
-    public async Task StopAsync()
-    {
-        IsTracking = false;
-        _cts?.Cancel();
-        if (_trackingTask is not null)
+        // ── Simulation path: Bùi Viện, HCMC ─────────────────────────────────
+        private readonly List<GpsCoordinate> _simPath = new()
         {
-            try { await _trackingTask; }
-            catch (OperationCanceledException) { }
-        }
-        _cts?.Dispose();
-        _cts = null;
-    }
+            new(10.76926, 106.69204), new(10.76910, 106.69220),
+            new(10.76895, 106.69235), new(10.76880, 106.69248),
+            new(10.76865, 106.69262), new(10.76850, 106.69275),
+            new(10.76835, 106.69288), new(10.76818, 106.69302),
+            new(10.76805, 106.69315), new(10.76790, 106.69328),
+        };
+        private int _simIndex;
+        private int _simDir = 1;
 
-    public async Task SwitchConfigAsync(GpsTrackingConfig newConfig)
-    {
-        if (!IsTracking) return;
-        await StopAsync();
-        await StartAsync(newConfig);
-    }
-
-    // ── Internal tracking loop ───────────────────────────────────────
-    private async Task RunTrackingLoopAsync(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
+        // ── Start / Stop ──────────────────────────────────────────────────────
+        public async Task StartTrackingAsync(bool simulate = false)
         {
-            await Task.Delay(Config.Interval, ct).ConfigureAwait(false);
-            if (ct.IsCancellationRequested) break;
-            await FetchOnceAsync(ct);
-        }
-    }
+            if (IsTracking) return;
+            IsTracking = true;
+            IsSimulating = simulate;
+            _cts = new CancellationTokenSource();
 
-    private async Task FetchOnceAsync(CancellationToken ct = default)
-    {
-        try
+            if (simulate)
+            {
+                _ = SimulationLoopAsync(_cts.Token);
+                StatusChanged?.Invoke(this, "🎮 Mô phỏng GPS");
+            }
+            else
+            {
+                await StartRealGpsAsync(_cts.Token);
+            }
+        }
+
+        public void StopTracking()
         {
-            var request = new GeolocationRequest(
-                accuracy: MapAccuracy(Config.DesiredAccuracy),
-                timeout: TimeSpan.FromSeconds(8));
+            _cts?.Cancel();
+            IsTracking = false;
 
-            var loc = await Geolocation.GetLocationAsync(request, ct);
-            if (loc is null) return;
+            if (!IsSimulating)
+            {
+                try { Geolocation.StopListeningForeground(); } catch { }
+            }
 
-            var geo = new GeoLocation(loc.Latitude, loc.Longitude, loc.Accuracy ?? 0);
-
-            // Lọc nhiễu: bỏ qua nếu di chuyển < MinDistance
-            if (CurrentLocation is not null &&
-                CurrentLocation.DistanceTo(geo) < Config.MinDistance) return;
-
-            CurrentLocation = geo;
-            _locationSubject.OnNext(geo);
+            StatusChanged?.Invoke(this, "⏹ GPS đã dừng");
         }
-        catch (FeatureNotEnabledException)
+
+        // ── Real GPS ──────────────────────────────────────────────────────────
+        private async Task StartRealGpsAsync(CancellationToken ct)
         {
-            // GPS bị tắt trên thiết bị – không crash
-        }
-        catch (PermissionException)
-        {
-            // Permission bị thu hồi runtime
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[GPS] Error: {ex.Message}");
-        }
-    }
+            try
+            {
+                var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    StatusChanged?.Invoke(this, "❌ Chưa cấp quyền GPS");
+                    IsTracking = false;
+                    return;
+                }
 
-    private static GeolocationAccuracy MapAccuracy(double meters) =>
-        meters <= 5   ? GeolocationAccuracy.Best    :
-        meters <= 10  ? GeolocationAccuracy.High    :
-        meters <= 30  ? GeolocationAccuracy.Medium  :
-        meters <= 100 ? GeolocationAccuracy.Low     :
-                        GeolocationAccuracy.Lowest;
+                var req = new GeolocationListeningRequest(
+                    GeolocationAccuracy.Best,
+                    TimeSpan.FromMilliseconds(UpdateIntervalMs));
 
-    // ── IAsyncDisposable ─────────────────────────────────────────────
-    public async ValueTask DisposeAsync()
-    {
-        await StopAsync();
-        _locationSubject.OnCompleted();
-        _locationSubject.Dispose();
+                Geolocation.LocationChanged += OnLocationChanged;
+                var started = await Geolocation.StartListeningForegroundAsync(req);
+
+                if (!started)
+                {
+                    StatusChanged?.Invoke(this, "❌ Không khởi động được GPS");
+                    IsTracking = false;
+                }
+                else
+                {
+                    StatusChanged?.Invoke(this, "🛰️ GPS thực đang hoạt động");
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusChanged?.Invoke(this, $"⚠️ GPS lỗi: {ex.Message}");
+                IsTracking = false;
+            }
+        }
+
+        private void OnLocationChanged(object? sender, GeolocationLocationChangedEventArgs e)
+        {
+            var loc = new GpsCoordinate(
+                e.Location.Latitude,
+                e.Location.Longitude,
+                e.Location.Accuracy ?? 10);
+            PushLocation(loc);
+        }
+
+        // ── Simulation ────────────────────────────────────────────────────────
+        private async Task SimulationLoopAsync(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var pt = _simPath[_simIndex];
+                    var rng = Random.Shared;
+                    var jitter = 0.000006;
+                    var loc = new GpsCoordinate(
+                        pt.Latitude + (rng.NextDouble() - 0.5) * jitter,
+                        pt.Longitude + (rng.NextDouble() - 0.5) * jitter,
+                        3.0 + rng.NextDouble() * 3);
+
+                    PushLocation(loc);
+
+                    _simIndex += _simDir;
+                    if (_simIndex >= _simPath.Count) { _simDir = -1; _simIndex = _simPath.Count - 2; }
+                    if (_simIndex < 0) { _simDir = 1; _simIndex = 1; }
+
+                    await Task.Delay(UpdateIntervalMs, ct);
+                }
+                catch (TaskCanceledException) { break; }
+                catch { /* swallow */ }
+            }
+        }
+
+        private void PushLocation(GpsCoordinate loc)
+        {
+            if (_lastLocation != null)
+                TotalDistance += _lastLocation.DistanceTo(loc);
+            CurrentLocation = loc;
+            _lastLocation = loc;
+            LocationUpdated?.Invoke(this, new GpsUpdateEventArgs(loc));
+        }
+
+        public void Dispose() => StopTracking();
     }
 }

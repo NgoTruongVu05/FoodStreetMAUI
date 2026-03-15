@@ -1,189 +1,174 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    x:Class="FoodStreetGuide.Views.MainPage"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:FoodStreetGuide.ViewModels"
-    xmlns:ctrl="clr-namespace:FoodStreetGuide.Controls"
-    x:DataType="vm:MainViewModel"
-    BackgroundColor="#0A0A0F"
-    Shell.NavBarIsVisible="False">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FoodStreetMAUI.ViewModels"
+             xmlns:models="clr-namespace:FoodStreetMAUI.Models"
+             x:Class="FoodStreetMAUI.Views.MainPage"
+             BackgroundColor="#0F0F16">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <!-- Colors -->
-            <Color x:Key="SurfaceColor">#141428</Color>
-            <Color x:Key="CardColor">#18182E</Color>
-            <Color x:Key="AccentBlue">#378ADD</Color>
-            <Color x:Key="AccentGreen">#22C55E</Color>
-            <Color x:Key="TextPrimary">#FFFFFF</Color>
-            <Color x:Key="TextSecondary">#888780</Color>
-            <Color x:Key="BorderColor">#2A2A4A</Color>
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="0">
 
-            <!-- Styles -->
-            <Style x:Key="CardStyle" TargetType="Border">
-                <Setter Property="BackgroundColor" Value="{StaticResource CardColor}" />
-                <Setter Property="StrokeThickness" Value="0.5" />
-                <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
-                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
-                <Setter Property="Padding" Value="14" />
-                <Setter Property="Margin" Value="0,0,0,8" />
-            </Style>
-
-            <Style x:Key="LabelSecondary" TargetType="Label">
-                <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
-                <Setter Property="FontSize" Value="12" />
-            </Style>
-
-            <Style x:Key="LabelPrimary" TargetType="Label">
-                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="FontSize" Value="14" />
-                <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-    <Grid RowDefinitions="Auto,*">
-
-        <!-- ══ Status Bar ══ -->
-        <Border Grid.Row="0"
-                BackgroundColor="#0A0A0F"
-                Padding="16,12,16,8">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,8">
             <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Phố Ẩm Thực"
-                       TextColor="{StaticResource TextPrimary}"
-                       FontSize="18"
-                       FontAttributes="Bold" />
-                <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                    <!-- GPS indicator -->
-                    <Border BackgroundColor="#1A1A2E"
-                            StrokeThickness="0.5"
-                            Stroke="{StaticResource AccentBlue}"
-                            StrokeShape="RoundRectangle 12"
-                            Padding="8,4">
-                        <Label Text="{Binding CoordinateText}"
-                               TextColor="#85B7EB"
-                               FontSize="11" />
-                    </Border>
-                    <!-- Tour toggle -->
-                    <Button Text="{Binding IsTourRunning, Converter={StaticResource BoolToTourLabel}}"
-                            Command="{Binding ToggleTourCommand}"
-                            BackgroundColor="{Binding IsTourRunning,
-                                Converter={StaticResource BoolToColor},
-                                ConverterParameter='#0F6E56|#993C1D'}"
-                            TextColor="White"
-                            FontSize="12"
-                            HeightRequest="32"
-                            Padding="12,0"
-                            CornerRadius="8" />
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Text="🍜 Food Street Guide" FontSize="15" FontAttributes="Bold" TextColor="#F0A030"/>
+                    <Label Text="Bùi Viện · Thuyết minh tự động" FontSize="10" TextColor="#666666"/>
+                </VerticalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                    <Label Text="{Binding GpsStatusText}" FontSize="10" TextColor="#888888" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
             </Grid>
         </Border>
 
-        <!-- ══ Main Content ══ -->
-        <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="16,0,16,16" Spacing="0">
+        <!-- Language selector -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal"
+                    HorizontalScrollBarVisibility="Never"
+                    BackgroundColor="#13131C">
+            <HorizontalStackLayout Padding="10,8" Spacing="8"
+                                   BindableLayout.ItemsSource="{Binding Languages}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LanguageItem">
+                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                BackgroundColor="#1E1E2E" Padding="10,5">
+                            <Label Text="{Binding Label}" FontSize="11" TextColor="White">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectLanguageCommand}"
+                                        CommandParameter="{Binding Code}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
 
-                <!-- Language Selector -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid RowDefinitions="Auto,Auto">
-                        <Label Text="Ngôn ngữ thuyết minh"
-                               Style="{StaticResource LabelSecondary}"
-                               Margin="0,0,0,8"/>
-                        <HorizontalStackLayout Grid.Row="1" Spacing="8">
-                            <Button Text="🇻🇳 VI"
-                                    Command="{Binding SetLanguageCommand}"
-                                    CommandParameter="{x:Static vm:AppLanguage.Vietnamese}"
-                                    BackgroundColor="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangToColor},
-                                        ConverterParameter='0'}"
-                                    TextColor="White" FontSize="12"
-                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
-                            <Button Text="🇬🇧 EN"
-                                    Command="{Binding SetLanguageCommand}"
-                                    CommandParameter="{x:Static vm:AppLanguage.English}"
-                                    BackgroundColor="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangToColor},
-                                        ConverterParameter='1'}"
-                                    TextColor="White" FontSize="12"
-                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
-                            <Button Text="🇨🇳 中文"
-                                    Command="{Binding SetLanguageCommand}"
-                                    CommandParameter="{x:Static vm:AppLanguage.Chinese}"
-                                    BackgroundColor="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangToColor},
-                                        ConverterParameter='2'}"
-                                    TextColor="White" FontSize="12"
-                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
-                            <Button Text="🇯🇵 日本語"
-                                    Command="{Binding SetLanguageCommand}"
-                                    CommandParameter="{x:Static vm:AppLanguage.Japanese}"
-                                    BackgroundColor="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangToColor},
-                                        ConverterParameter='3'}"
-                                    TextColor="White" FontSize="12"
-                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
-                        </HorizontalStackLayout>
+        <!-- GPS coords bar -->
+        <Border Grid.Row="2" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,5">
+            <Grid ColumnDefinitions="*,Auto">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="📍" FontSize="12"/>
+                    <Label Text="{Binding CoordinateText}" FontSize="11" TextColor="#3ADB76" VerticalOptions="Center"/>
+                    <Label Text="{Binding AccuracyText}" FontSize="10" TextColor="#555555" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+                <Label Grid.Column="1" Text="{Binding SessionTimeText}" FontSize="11" TextColor="#888888" VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Main scroll area -->
+        <ScrollView Grid.Row="3" BackgroundColor="#0F0F16">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Map -->
+                <GraphicsView x:Name="mapView" HeightRequest="260" BackgroundColor="#111820"/>
+
+                <!-- Now playing -->
+                <Border Margin="10,8" BackgroundColor="#1F1A10"
+                        Stroke="#F0A030" StrokeThickness="0.5"
+                        StrokeShape="RoundRectangle 12" Padding="12,10"
+                        IsVisible="{Binding IsPlayingAudio}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="🔊 Đang phát thuyết minh" FontSize="10" TextColor="#F0A030"/>
+                            <Label Text="{Binding NowPlayingTitle}" FontSize="13" FontAttributes="Bold"
+                                   TextColor="#E8E0D0" LineBreakMode="TailTruncation"/>
+                            <Label Text="{Binding NowPlayingDesc}" FontSize="11" TextColor="#999999"
+                                   LineBreakMode="WordWrap"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="⏹" FontSize="12" VerticalOptions="Start"
+                                BackgroundColor="#2A1515" TextColor="#E06060"
+                                WidthRequest="38" HeightRequest="38" CornerRadius="8"
+                                Command="{Binding StopAudioCommand}"/>
                     </Grid>
                 </Border>
 
-                <!-- Tab Bar -->
-                <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,12">
-                    <Button Grid.Column="0" Text="Thuyết minh"
-                            Command="{Binding SetTabCommand}" CommandParameter="0"
-                            BackgroundColor="Transparent"
-                            TextColor="{Binding ActiveTabIndex,
-                                Converter={StaticResource TabColor}, ConverterParameter='0'}"
-                            FontSize="13" BorderWidth="0" />
-                    <Button Grid.Column="1" Text="Điểm POI"
-                            Command="{Binding SetTabCommand}" CommandParameter="1"
-                            BackgroundColor="Transparent"
-                            TextColor="{Binding ActiveTabIndex,
-                                Converter={StaticResource TabColor}, ConverterParameter='1'}"
-                            FontSize="13" BorderWidth="0" />
-                    <Button Grid.Column="2" Text="Hệ thống"
-                            Command="{Binding SetTabCommand}" CommandParameter="2"
-                            BackgroundColor="Transparent"
-                            TextColor="{Binding ActiveTabIndex,
-                                Converter={StaticResource TabColor}, ConverterParameter='2'}"
-                            FontSize="13" BorderWidth="0" />
-                </Grid>
+                <!-- POI list label -->
+                <Label Text="📌 Điểm thuyết minh" FontSize="11" TextColor="#666666" Margin="14,8,14,4"/>
 
-                <!-- ── Tab 0: Audio Guide ── -->
-                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
-                                        Converter={StaticResource TabVisible},
-                                        ConverterParameter='0'}">
-                    <ctrl:AudioPlayerControl BindingContext="{Binding Player}" />
+                <!-- POI items -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Pois}"
+                                     Margin="10,0,10,8" Spacing="6">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:PointOfInterest">
+                            <Border Padding="12,10" StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0.5" BackgroundColor="#1A1A26" Stroke="#2A2A3A">
+                                <Grid ColumnDefinitions="40,*,Auto">
+                                    <Label Grid.Column="0" Text="{Binding Emoji}"
+                                           FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
+                                        <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" Padding="8,4"
+                                            StrokeShape="RoundRectangle 8" StrokeThickness="0"
+                                            BackgroundColor="#1A1A28" VerticalOptions="Center">
+                                        <Label Text="○ Xa" FontSize="10" TextColor="#444444" VerticalOptions="Center"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
-                <!-- ── Tab 1: POI List ── -->
-                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
-                                        Converter={StaticResource TabVisible},
-                                        ConverterParameter='1'}">
-                    <Label Text="Điểm POI lân cận"
-                           Style="{StaticResource LabelSecondary}"
-                           Margin="0,0,0,8"/>
-                    <CollectionView ItemsSource="{Binding Pois}"
-                                    SelectionMode="None">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:PoiViewModel">
-                                <ctrl:PoiCardControl
-                                    SelectCommand="{Binding Source={RelativeSource
-                                        AncestorType={x:Type vm:MainViewModel}},
-                                        Path=SelectPoiCommand}" />
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
+                <!-- Log label -->
+                <Label Text="📋 Nhật ký" FontSize="11" TextColor="#666666" Margin="14,4,14,4"/>
 
-                <!-- ── Tab 2: System ── -->
-                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
-                                        Converter={StaticResource TabVisible},
-                                        ConverterParameter='2'}">
-                    <ctrl:SystemStatusControl />
+                <!-- Log items -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding LogLines}"
+                                     Margin="10,0,10,8" Spacing="1">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Label Text="{Binding .}" FontSize="10" TextColor="#3ADB76" Margin="0,1"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Stats bar -->
+        <Border Grid.Row="4" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,6">
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                    <Label Text="{Binding VisitedCount, StringFormat='🏛️ {0}'}"
+                           FontSize="14" FontAttributes="Bold" TextColor="#E0E0F0" HorizontalOptions="Center"/>
+                    <Label Text="Điểm thăm" FontSize="9" TextColor="#555555" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                    <Label Text="{Binding DistanceText}"
+                           FontSize="14" FontAttributes="Bold" TextColor="#E0E0F0" HorizontalOptions="Center"/>
+                    <Label Text="Quãng đường" FontSize="9" TextColor="#555555" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                    <Label Text="{Binding SessionTimeText}"
+                           FontSize="14" FontAttributes="Bold" TextColor="#E0E0F0" HorizontalOptions="Center"/>
+                    <Label Text="Thời gian" FontSize="9" TextColor="#555555" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Bottom action bar -->
+        <Border Grid.Row="5" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,10">
+            <Grid ColumnDefinitions="*,90" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="{Binding StartButtonText}"
+                        BackgroundColor="{Binding StartButtonColor}"
+                        TextColor="White" FontSize="13"
+                        CornerRadius="10" HeightRequest="44"
+                        Command="{Binding ToggleGpsCommand}"/>
+                <Border Grid.Column="1" BackgroundColor="#1E1E2E"
+                        Stroke="#2A2A3A" StrokeThickness="0.5"
+                        StrokeShape="RoundRectangle 10" Padding="8,4">
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="🎮 Mô phỏng" FontSize="9" TextColor="#888888" HorizontalOptions="Center"/>
+                        <Switch IsToggled="{Binding IsSimulating}"
+                                OnColor="#F0A030" ThumbColor="White"
+                                HorizontalOptions="Center" Scale="0.8"/>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+
     </Grid>
 </ContentPage>

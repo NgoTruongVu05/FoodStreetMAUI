@@ -1,73 +1,33 @@
-using FoodStreetGuide.Data;
-using FoodStreetGuide.Services;
-using FoodStreetGuide.ViewModels;
-using FoodStreetGuide.Views;
-using Plugin.Maui.Audio;
+using FoodStreetMAUI.Services;
+using FoodStreetMAUI.ViewModels;
+using FoodStreetMAUI.Views;
+using Microsoft.Extensions.Logging;
 
-// CommunityToolkit.Maui bị bỏ vì chưa tương thích workload 10.0.20.
-// Thay thế: dùng MAUI built-in Toast/Alert trực tiếp từ MainThread.
-// Khi SDK 10.0.300 ra, thêm lại: using CommunityToolkit.Maui;
-
-namespace FoodStreetGuide;
+namespace FoodStreetMAUI;
 
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-
         builder
-            .UseMauiApp<App>()
-            // .UseMauiCommunityToolkit() — bỏ, CT.Maui chưa support workload 10.0.20
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf",  "OpenSansRegular");
-                fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
-            })
-            .ConfigureLifecycleEvents(lifecycle =>
-            {
-#if ANDROID
-                lifecycle.AddAndroid(android => android
-                    .OnStop (_ => GetOrchestrator()?.OnAppBackgrounded())
-                    .OnStart(_ => GetOrchestrator()?.OnAppForegrounded())
-                );
-#elif IOS
-                lifecycle.AddiOS(ios => ios
-                    .WillResignActive(_ => GetOrchestrator()?.OnAppBackgrounded())
-                    .OnActivated     (_ => GetOrchestrator()?.OnAppForegrounded())
-                );
-#endif
-            });
+            .UseMauiApp<App>();
 
-        // ── Services ──────────────────────────────────────────────────────────
-        builder.Services.AddSingleton<IGpsService,       GpsService>();
-        builder.Services.AddSingleton<IGeofenceService,  GeofenceService>();
-        builder.Services.AddSingleton<IAudioService,     AudioService>();
-        builder.Services.AddSingleton<ITourOrchestrator, TourOrchestrator>();
-        builder.Services.AddSingleton<IPoiRepository,    SamplePoiRepository>();
-        builder.Services.AddSingleton(AudioManager.Current);
+        // Services (Singleton — shared across app lifetime)
+        builder.Services.AddSingleton<GpsService>();
+        builder.Services.AddSingleton<GeofenceService>();
+        builder.Services.AddSingleton<AudioService>();
+        builder.Services.AddSingleton<DataService>();
 
-        // ── ViewModels ────────────────────────────────────────────────────────
-        builder.Services.AddTransient<AudioPlayerViewModel>();
-        builder.Services.AddTransient<MainViewModel>();
-
-        // ── Views ─────────────────────────────────────────────────────────────
-        builder.Services.AddTransient<MainPage>();
+        // ViewModel + View
+        builder.Services.AddSingleton<MainViewModel>();
+        builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<App>();
 
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
+
         return builder.Build();
-    }
-
-    private static TourOrchestrator? GetOrchestrator() =>
-        IPlatformApplication.Current?.Services
-            .GetService<ITourOrchestrator>() as TourOrchestrator;
-}
-
-internal static class ObjectExtensions
-{
-    public static T Let<T>(this T self, Action<T> action)
-    {
-        action(self);
-        return self;
     }
 }
