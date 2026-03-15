@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- GPS Permissions (required for iOS) -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Ứng dụng cần vị trí của bạn để tự động phát thuyết minh khi đến gần điểm ẩm thực.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Cấp quyền vị trí liên tục để nhận thuyết minh ngay cả khi app đang chạy nền.</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Phố Ẩm Thực theo dõi vị trí nền để kích hoạt thuyết minh tự động.</string>
+
+    <!-- Microphone (TTS playback - iOS requires this) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Dùng để phát thuyết minh qua loa thiết bị.</string>
+
+    <!-- Background Modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>audio</string>
+        <string>fetch</string>
+    </array>
+
+    <!-- App info -->
+    <key>CFBundleDisplayName</key>
+    <string>Phố Ẩm Thực</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.foodstreet.guide</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>MinimumOSVersion</key>
+    <string>15.0</string>
+</dict>
+</plist>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FoodStreetGuide.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:FoodStreetGuide.ViewModels"
+    xmlns:ctrl="clr-namespace:FoodStreetGuide.Controls"
+    x:DataType="vm:MainViewModel"
+    BackgroundColor="#0A0A0F"
+    Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Colors -->
+            <Color x:Key="SurfaceColor">#141428</Color>
+            <Color x:Key="CardColor">#18182E</Color>
+            <Color x:Key="AccentBlue">#378ADD</Color>
+            <Color x:Key="AccentGreen">#22C55E</Color>
+            <Color x:Key="TextPrimary">#FFFFFF</Color>
+            <Color x:Key="TextSecondary">#888780</Color>
+            <Color x:Key="BorderColor">#2A2A4A</Color>
+
+            <!-- Styles -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardColor}" />
+                <Setter Property="StrokeThickness" Value="0.5" />
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="Margin" Value="0,0,0,8" />
+            </Style>
+
+            <Style x:Key="LabelSecondary" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+
+            <Style x:Key="LabelPrimary" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ══ Status Bar ══ -->
+        <Border Grid.Row="0"
+                BackgroundColor="#0A0A0F"
+                Padding="16,12,16,8">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Phố Ẩm Thực"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontSize="18"
+                       FontAttributes="Bold" />
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <!-- GPS indicator -->
+                    <Border BackgroundColor="#1A1A2E"
+                            StrokeThickness="0.5"
+                            Stroke="{StaticResource AccentBlue}"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="8,4">
+                        <Label Text="{Binding CoordinateText}"
+                               TextColor="#85B7EB"
+                               FontSize="11" />
+                    </Border>
+                    <!-- Tour toggle -->
+                    <Button Text="{Binding IsTourRunning, Converter={StaticResource BoolToTourLabel}}"
+                            Command="{Binding ToggleTourCommand}"
+                            BackgroundColor="{Binding IsTourRunning,
+                                Converter={StaticResource BoolToColor},
+                                ConverterParameter='#0F6E56|#993C1D'}"
+                            TextColor="White"
+                            FontSize="12"
+                            HeightRequest="32"
+                            Padding="12,0"
+                            CornerRadius="8" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- ══ Main Content ══ -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16,0,16,16" Spacing="0">
+
+                <!-- Language Selector -->
+                <Border Style="{StaticResource CardStyle}">
+                    <Grid RowDefinitions="Auto,Auto">
+                        <Label Text="Ngôn ngữ thuyết minh"
+                               Style="{StaticResource LabelSecondary}"
+                               Margin="0,0,0,8"/>
+                        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+                            <Button Text="🇻🇳 VI"
+                                    Command="{Binding SetLanguageCommand}"
+                                    CommandParameter="{x:Static vm:AppLanguage.Vietnamese}"
+                                    BackgroundColor="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangToColor},
+                                        ConverterParameter='0'}"
+                                    TextColor="White" FontSize="12"
+                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
+                            <Button Text="🇬🇧 EN"
+                                    Command="{Binding SetLanguageCommand}"
+                                    CommandParameter="{x:Static vm:AppLanguage.English}"
+                                    BackgroundColor="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangToColor},
+                                        ConverterParameter='1'}"
+                                    TextColor="White" FontSize="12"
+                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
+                            <Button Text="🇨🇳 中文"
+                                    Command="{Binding SetLanguageCommand}"
+                                    CommandParameter="{x:Static vm:AppLanguage.Chinese}"
+                                    BackgroundColor="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangToColor},
+                                        ConverterParameter='2'}"
+                                    TextColor="White" FontSize="12"
+                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
+                            <Button Text="🇯🇵 日本語"
+                                    Command="{Binding SetLanguageCommand}"
+                                    CommandParameter="{x:Static vm:AppLanguage.Japanese}"
+                                    BackgroundColor="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangToColor},
+                                        ConverterParameter='3'}"
+                                    TextColor="White" FontSize="12"
+                                    CornerRadius="8" HeightRequest="36" Padding="12,0"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Tab Bar -->
+                <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,12">
+                    <Button Grid.Column="0" Text="Thuyết minh"
+                            Command="{Binding SetTabCommand}" CommandParameter="0"
+                            BackgroundColor="Transparent"
+                            TextColor="{Binding ActiveTabIndex,
+                                Converter={StaticResource TabColor}, ConverterParameter='0'}"
+                            FontSize="13" BorderWidth="0" />
+                    <Button Grid.Column="1" Text="Điểm POI"
+                            Command="{Binding SetTabCommand}" CommandParameter="1"
+                            BackgroundColor="Transparent"
+                            TextColor="{Binding ActiveTabIndex,
+                                Converter={StaticResource TabColor}, ConverterParameter='1'}"
+                            FontSize="13" BorderWidth="0" />
+                    <Button Grid.Column="2" Text="Hệ thống"
+                            Command="{Binding SetTabCommand}" CommandParameter="2"
+                            BackgroundColor="Transparent"
+                            TextColor="{Binding ActiveTabIndex,
+                                Converter={StaticResource TabColor}, ConverterParameter='2'}"
+                            FontSize="13" BorderWidth="0" />
+                </Grid>
+
+                <!-- ── Tab 0: Audio Guide ── -->
+                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
+                                        Converter={StaticResource TabVisible},
+                                        ConverterParameter='0'}">
+                    <ctrl:AudioPlayerControl BindingContext="{Binding Player}" />
+                </VerticalStackLayout>
+
+                <!-- ── Tab 1: POI List ── -->
+                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
+                                        Converter={StaticResource TabVisible},
+                                        ConverterParameter='1'}">
+                    <Label Text="Điểm POI lân cận"
+                           Style="{StaticResource LabelSecondary}"
+                           Margin="0,0,0,8"/>
+                    <CollectionView ItemsSource="{Binding Pois}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PoiViewModel">
+                                <ctrl:PoiCardControl
+                                    SelectCommand="{Binding Source={RelativeSource
+                                        AncestorType={x:Type vm:MainViewModel}},
+                                        Path=SelectPoiCommand}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- ── Tab 2: System ── -->
+                <VerticalStackLayout IsVisible="{Binding ActiveTabIndex,
+                                        Converter={StaticResource TabVisible},
+                                        ConverterParameter='2'}">
+                    <ctrl:SystemStatusControl />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
