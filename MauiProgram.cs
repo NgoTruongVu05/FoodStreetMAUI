@@ -2,6 +2,7 @@ using FoodStreetMAUI.Services;
 using FoodStreetMAUI.ViewModels;
 using FoodStreetMAUI.Views;
 using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace FoodStreetMAUI;
 
@@ -11,7 +12,9 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder
-            .UseMauiApp<App>();
+            .UseMauiApp<App>()
+            // Mapsui.Maui cần SkiaSharp (handler SKGLView trên Android)
+            .UseSkiaSharp();
 
         // Services (Singleton — shared across app lifetime)
         builder.Services.AddSingleton<GpsService>();

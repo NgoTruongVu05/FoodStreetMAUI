@@ -17,16 +17,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <MauiIcon Include="Resources/Images/appicon.svg" Color="#0F0F16"/>
-    <MauiSplashScreen Include="Resources/Images/splashscreen.svg" Color="#0F0F16" BaseSize="128,128"/>
-    <MauiFont Include="Resources/Fonts/*"/>
-    <MauiImage Include="Resources/Images/*" Exclude="Resources/Images/appicon.svg;Resources/Images/splashscreen.svg"/>
+    <MauiIcon Include="Resources/Images/appicon.svg" Color="#0F0F16" />
+    <MauiSplashScreen Include="Resources/Images/splashscreen.svg" Color="#0F0F16" BaseSize="128,128" />
+    <MauiFont Include="Resources/Fonts/*" />
+    <MauiImage Include="Resources/Images/*" Exclude="Resources/Images/appicon.svg;Resources/Images/splashscreen.svg" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    <PackageReference Include="Mapsui.Maui" Version="5.0.2" />
+    <PackageReference Include="Mapsui.Tiling" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

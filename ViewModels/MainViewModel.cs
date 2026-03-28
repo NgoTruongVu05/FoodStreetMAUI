@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -31,6 +32,12 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string sessionTimeText = "00:00";
         [ObservableProperty] string startButtonText = "Bat Dau GPS";
         [ObservableProperty] string startButtonColor = "#1a3a1e";
+        [ObservableProperty] double? lastLatitude;
+        [ObservableProperty] double? lastLongitude;
+        [ObservableProperty] Guid? nearestPoiId;
+        [ObservableProperty] double nearestPoiDistanceMeters;
+        [ObservableProperty] string nearestPoiSummary = "";
+        [ObservableProperty] bool showNearestPoiBanner;
 
         public ObservableCollection<PointOfInterest> Pois { get; } = new();
         public ObservableCollection<string> LogLines { get; } = new();
@@ -60,7 +67,13 @@ namespace FoodStreetMAUI.ViewModels
             _geo.GeofenceTriggered += OnGeofenceTriggered;
             _geo.LogMessage += (s, m) => AddLog(m);
             _audio.StatusChanged += (s, m) => AddLog(m);
+            Pois.CollectionChanged += OnPoisCollectionChanged;
         }
+
+        public event EventHandler? NearestPoiOrLocationChanged;
+
+        private void OnPoisCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
 
         [RelayCommand]
         async Task LoadDataAsync()
@@ -76,6 +89,7 @@ namespace FoodStreetMAUI.ViewModels
                     _geo.AddPoi(p);
                 }
                 AddLog("Da tai " + pois.Count + " diem thuyet minh");
+                NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -151,16 +165,47 @@ namespace FoodStreetMAUI.ViewModels
             // Cập nhật geofence NGAY (không cần main thread)
             try { _geo.UpdateLocation(e.Location); } catch { }
 
+            var loc = e.Location;
+            var nearby = _geo.GetNearby(loc, maxDist: 1_000_000);
+            Guid? newNearestId = null;
+            double newNearestDist = 0;
+            if (nearby.Count > 0)
+            {
+                newNearestId = nearby[0].poi.Id;
+                newNearestDist = nearby[0].dist;
+            }
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 try
                 {
-                    var loc = e.Location;
+                    LastLatitude = loc.Latitude;
+                    LastLongitude = loc.Longitude;
                     CoordinateText = loc.Latitude.ToString("F5") + ", " + loc.Longitude.ToString("F5");
                     AccuracyText = "+-" + loc.Accuracy.ToString("F1") + " m";
                     DistanceText = _gps.TotalDistance < 1000
                         ? ((int)_gps.TotalDistance) + " m"
                         : (_gps.TotalDistance / 1000).ToString("F2") + " km";
+
+                    if (NearestPoiId != newNearestId
+                        || Math.Abs(NearestPoiDistanceMeters - newNearestDist) > 0.5)
+                    {
+                        NearestPoiId = newNearestId;
+                        NearestPoiDistanceMeters = newNearestDist;
+                        if (newNearestId.HasValue && nearby.Count > 0)
+                        {
+                            var p = nearby[0].poi;
+                            NearestPoiSummary = p.DisplayName + " · " + (int)newNearestDist + " m";
+                            ShowNearestPoiBanner = true;
+                        }
+                        else
+                        {
+                            NearestPoiSummary = "";
+                            ShowNearestPoiBanner = false;
+                        }
+
+                        NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
+                    }
                 }
                 catch { }
             });
@@ -227,6 +272,7 @@ namespace FoodStreetMAUI.ViewModels
 
         public void Cleanup()
         {
+            Pois.CollectionChanged -= OnPoisCollectionChanged;
             try { _gps.Dispose(); } catch { }
             try { _audio.Dispose(); } catch { }
             try { _sessionTimer?.Stop(); } catch { }
