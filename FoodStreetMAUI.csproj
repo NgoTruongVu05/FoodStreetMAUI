@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ApplicationTitle>Food Street Guide</ApplicationTitle>
     <ApplicationId>com.foodstreet.guide</ApplicationId>

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Bumptech.Glide.Load.Model;
 using FoodStreetMAUI.ViewModels;
 using Mapsui;
 using Mapsui.Layers;
@@ -6,9 +6,12 @@ using Mapsui.Projections;
 using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
-using MColor = Mapsui.Styles.Color;
-using MBrush = Mapsui.Styles.Brush;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using System.Collections.Generic;
 using MapsuiMap = Mapsui.Map;
+using MBrush = Mapsui.Styles.Brush;
+using MColor = Mapsui.Styles.Color;
 
 namespace FoodStreetMAUI.Views
 {
@@ -115,23 +118,23 @@ namespace FoodStreetMAUI.Views
 
         private static IStyle PoiSymbolStyle(bool nearest)
         {
-            if (nearest)
-            {
-                return new SymbolStyle
-                {
-                    SymbolType = SymbolType.Ellipse,
-                    SymbolScale = 1.45f,
-                    Fill = new MBrush { Color = MColor.FromArgb(255, 255, 212, 74) },
-                    Outline = new Pen { Color = MColor.White, Width = 3 },
-                };
-            }
-
             return new SymbolStyle
             {
-                SymbolType = SymbolType.Ellipse,
-                SymbolScale = 1f,
-                Fill = new MBrush { Color = MColor.FromArgb(255, 80, 128, 192) },
-                Outline = new Pen { Color = MColor.White, Width = 2 },
+                SymbolType = SymbolType.Ellipse, // hình tròn
+                SymbolScale = nearest ? 1.3f : 0.9f,
+
+                Fill = new MBrush
+                {
+                    Color = nearest
+                ? MColor.Red     // POI gần nhất
+                : MColor.Green   // POI thường
+                },
+
+                Outline = new Pen
+                {
+                    Color = MColor.White,
+                    Width = 2
+                }
             };
         }
 
@@ -139,8 +142,8 @@ namespace FoodStreetMAUI.Views
             => new SymbolStyle
             {
                 SymbolType = SymbolType.Ellipse,
-                SymbolScale = 1.05f,
-                Fill = new MBrush { Color = MColor.FromArgb(255, 0, 180, 255) },
+                SymbolScale = 0.6f,
+                Fill = new MBrush { Color = MColor.Blue },
                 Outline = new Pen { Color = MColor.White, Width = 2 },
             };
 
