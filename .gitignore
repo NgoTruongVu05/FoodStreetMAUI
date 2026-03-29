@@ -1,45 +1,37 @@
+# Visual Studio
 .vs/
-**/bin/
-**/obj/
 *.user
-*.userosscache
 *.suo
 *.userprefs
 *.csproj.user
 *.sln.docstates
+*.vsconfig
+
+# Build
+bin/
+obj/
+publish/
+dist/
 
 # NuGet
-.nuget/
+.nuget/packages/
 packages/
 *.nupkg
 
-# Rider
+# IDE
 .idea/
-.idea/*
-*.sln.iml
-
-# ReSharper
-_ReSharper*/
-*.DotSettings.user
-
-# Visual Studio Code
 .vscode/
 
 # Logs
 *.log
 TestResults/
 
-# Build results
-publish/
-dist/
-
-# macOS
+# OS
 .DS_Store
-
-# Windows thumbnail cache files
 Thumbs.db
+ehthumbs.db
 
-# Android/Gradle
+# Android
 **/gradle/
 **/.gradle/
 **/*.keystore
@@ -49,32 +41,26 @@ Thumbs.db
 *.xcuserdata
 *.xcodeproj/project.xcworkspace/
 
-# Certificates, provisioning profiles
+# Certificates
 *.p12
 *.mobileprovision
 
-# Xamarin / MAUI specific
+# MAUI / Xamarin
 *.apk
 *.apks
 *.aab
 *.ipa
 *.app
-*.app.dSYM
+*.dSYM
 *.symbols
-obj/**/generated
 
-# Temporary files
+# Temp
 *.tmp
 *.temp
 
-# User secrets (local)
+# Secrets
 secrets.json
 
-# Dotnet local tool manifest
-.store/
-
-# Ignore generated JetBrains Rider files
-/.idea/
-
-# Ensure Visual Studio user files are ignored
-*.vsconfig
+# Cache
+*.cache
+*.pdb
