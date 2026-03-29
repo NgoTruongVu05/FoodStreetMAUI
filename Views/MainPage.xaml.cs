@@ -1,4 +1,3 @@
-using Bumptech.Glide.Load.Model;
 using FoodStreetMAUI.ViewModels;
 using Mapsui;
 using Mapsui.Layers;
