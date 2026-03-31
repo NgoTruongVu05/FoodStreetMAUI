@@ -22,6 +22,7 @@ namespace FoodStreetMAUI.Views
         private MapsuiMap? _map;
         private MemoryLayer? _markerLayer;
         private bool _viewportInitialized;
+        private bool _hasCenteredOnUser;
 
         public MainPage(MainViewModel vm)
         {
@@ -100,6 +101,18 @@ namespace FoodStreetMAUI.Views
             {
                 var (ux, uy) = SphericalMercator.FromLonLat(lo, la);
                 list.Add(new PointFeature(new MPoint(ux, uy)) { Styles = { UserSymbolStyle() } });
+
+                if (_vm.IsTracking && !_hasCenteredOnUser && _map?.Navigator != null && _map.Navigator.Resolutions.Count > 0)
+                {
+                    var i = System.Math.Min(16, _map.Navigator.Resolutions.Count - 1);
+                    _map.Navigator.CenterOnAndZoomTo(new MPoint(ux, uy), _map.Navigator.Resolutions[i], duration: 0);
+                    _hasCenteredOnUser = true;
+                }
+            }
+
+            if (!_vm.IsTracking)
+            {
+                _hasCenteredOnUser = false;
             }
 
             _markerLayer.Features = list;
@@ -145,7 +158,7 @@ namespace FoodStreetMAUI.Views
             => new SymbolStyle
             {
                 SymbolType = SymbolType.Ellipse,
-                SymbolScale = 0.6f,
+                SymbolScale = 1.0f,
                 Fill = new MBrush { Color = MColor.Blue },
                 Outline = new Pen { Color = MColor.White, Width = 2 },
             };

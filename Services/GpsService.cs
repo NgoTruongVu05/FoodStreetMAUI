@@ -77,7 +77,12 @@ namespace FoodStreetMAUI.Services
         {
             try
             {
-                var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
+
                 if (status != PermissionStatus.Granted)
                 {
                     StatusChanged?.Invoke(this, "❌ Chưa cấp quyền GPS");
@@ -85,21 +90,51 @@ namespace FoodStreetMAUI.Services
                     return;
                 }
 
+                Geolocation.LocationChanged -= OnLocationChanged;
+                Geolocation.LocationChanged += OnLocationChanged;
+
                 var req = new GeolocationListeningRequest(
                     GeolocationAccuracy.Best,
                     TimeSpan.FromMilliseconds(UpdateIntervalMs));
 
-                Geolocation.LocationChanged += OnLocationChanged;
                 var started = await Geolocation.StartListeningForegroundAsync(req);
 
                 if (!started)
                 {
-                    StatusChanged?.Invoke(this, "❌ Không khởi động được GPS");
-                    IsTracking = false;
+                    StatusChanged?.Invoke(this, "🛰️ GPS thực đang hoạt động (Polling)");
+
+                    // Fallback to polling if continuous listening is not supported
+                    _ = Task.Run(async () =>
+                    {
+                        while (IsTracking && !ct.IsCancellationRequested)
+                        {
+                            try
+                            {
+                                var loc = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(5)), ct);
+                                if (loc != null)
+                                {
+                                    PushLocation(new GpsCoordinate(loc.Latitude, loc.Longitude, loc.Accuracy ?? 10));
+                                }
+                            }
+                            catch { }
+
+                            await Task.Delay(UpdateIntervalMs, ct);
+                        }
+                    }, ct);
                 }
                 else
                 {
                     StatusChanged?.Invoke(this, "🛰️ GPS thực đang hoạt động");
+
+                    try
+                    {
+                        var lastLoc = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(5)), ct);
+                        if (lastLoc != null)
+                        {
+                            PushLocation(new GpsCoordinate(lastLoc.Latitude, lastLoc.Longitude, lastLoc.Accuracy ?? 10));
+                        }
+                    }
+                    catch { }
                 }
             }
             catch (Exception ex)

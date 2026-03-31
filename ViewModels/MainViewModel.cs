@@ -22,7 +22,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string coordinateText = "---";
         [ObservableProperty] string accuracyText = "";
         [ObservableProperty] bool isTracking = false;
-        [ObservableProperty] bool isSimulating = true;
+        [ObservableProperty] bool isSimulating = false;
         [ObservableProperty] bool isMuted = false;
         [ObservableProperty] float volume = 0.8f;
         [ObservableProperty] string nowPlayingTitle = "Cho kich hoat POI...";
@@ -31,7 +31,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] int visitedCount = 0;
         [ObservableProperty] string distanceText = "0 m";
         [ObservableProperty] string sessionTimeText = "00:00";
-        [ObservableProperty] string startButtonText = "Bat Dau GPS";
+        [ObservableProperty] string startButtonText = "Bật GPS";
         [ObservableProperty] string startButtonColor = "#1a3a1e";
         [ObservableProperty] double? lastLatitude;
         [ObservableProperty] double? lastLongitude;
@@ -108,7 +108,7 @@ namespace FoodStreetMAUI.ViewModels
                     _gps.StopTracking();
                     _sessionTimer?.Stop();
                     IsTracking = false;
-                    StartButtonText = "Bat Dau GPS";
+                    StartButtonText = "Bật GPS";
                     StartButtonColor = "#1a3a1e";
                 }
                 else
@@ -117,7 +117,7 @@ namespace FoodStreetMAUI.ViewModels
                     StartSessionTimer();
                     await _gps.StartTrackingAsync(IsSimulating);
                     IsTracking = true;
-                    StartButtonText = "Dung GPS";
+                    StartButtonText = "Tắt GPS";
                     StartButtonColor = "#3a1a1a";
                     AddLog(IsSimulating ? "Mo phong tour Bui Vien..." : "GPS thuc dang hoat dong...");
                 }
@@ -205,8 +205,9 @@ namespace FoodStreetMAUI.ViewModels
                             ShowNearestPoiBanner = false;
                         }
 
-                        NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
                     }
+
+                    NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
                 }
                 catch { }
             });
