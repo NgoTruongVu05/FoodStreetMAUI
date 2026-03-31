@@ -32,7 +32,6 @@ namespace FoodStreetMAUI.Views
 
             _mapControl = new MapControl
             {
-                HeightRequest = 280,
                 HorizontalOptions = LayoutOptions.Fill,
                 VerticalOptions = LayoutOptions.Fill,
             };
@@ -59,6 +58,11 @@ namespace FoodStreetMAUI.Views
             base.OnAppearing();
             await _vm.LoadDataCommand.ExecuteAsync(null);
             RefreshMarkerLayer();
+        }
+
+        private async void OnOpenPoiListClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new PoiListPage(_vm));
         }
 
         private MPoint? GetCenterMPoint()

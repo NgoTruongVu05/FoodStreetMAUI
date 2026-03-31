@@ -56,22 +56,24 @@
             </Grid>
         </Border>
 
-        <!-- Main scroll area -->
-        <ScrollView Grid.Row="3" BackgroundColor="#0F0F16">
-            <VerticalStackLayout Spacing="0">
+        <!-- Main map area -->
+        <Grid Grid.Row="3" BackgroundColor="#0F0F16">
+            <!-- Mapsui + OpenStreetMap (Mapsui.Tiling) — không cần Google Maps API key -->
+            <Grid x:Name="MapHost" BackgroundColor="#111820"/>
 
-                <!-- Mapsui + OpenStreetMap (Mapsui.Tiling) — không cần Google Maps API key -->
-                <Grid x:Name="MapHost" HeightRequest="280" BackgroundColor="#111820"/>
-
+            <!-- Floating top elements -->
+            <VerticalStackLayout Spacing="0" VerticalOptions="Start" InputTransparent="True" CascadeInputTransparent="False">
                 <Label Text="{Binding NearestPoiSummary}" FontSize="11" TextColor="#F0A030"
                        Margin="14,6,14,0" LineBreakMode="TailTruncation"
-                       IsVisible="{Binding ShowNearestPoiBanner}"/>
+                       IsVisible="{Binding ShowNearestPoiBanner}"
+                       InputTransparent="False"/>
 
                 <!-- Now playing -->
                 <Border Margin="10,8" BackgroundColor="#1F1A10"
                         Stroke="#F0A030" StrokeThickness="0.5"
                         StrokeShape="RoundRectangle 12" Padding="12,10"
-                        IsVisible="{Binding IsPlayingAudio}">
+                        IsVisible="{Binding IsPlayingAudio}"
+                        InputTransparent="False">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" Spacing="4">
                             <Label Text="🔊 Đang phát thuyết minh" FontSize="10" TextColor="#F0A030"/>
@@ -86,50 +88,17 @@
                                 Command="{Binding StopAudioCommand}"/>
                     </Grid>
                 </Border>
-
-                <!-- POI list label -->
-                <Label Text="📌 Điểm thuyết minh" FontSize="11" TextColor="#666666" Margin="14,8,14,4"/>
-
-                <!-- POI items -->
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Pois}"
-                                     Margin="10,0,10,8" Spacing="6">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="models:PointOfInterest">
-                            <Border Padding="12,10" StrokeShape="RoundRectangle 12"
-                                    StrokeThickness="0.5" BackgroundColor="#1A1A26" Stroke="#2A2A3A">
-                                <Grid ColumnDefinitions="40,*,Auto">
-                                    <Label Grid.Column="0" Text="{Binding Emoji}"
-                                           FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                        <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
-                                        <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
-                                    </VerticalStackLayout>
-                                    <Border Grid.Column="2" Padding="8,4"
-                                            StrokeShape="RoundRectangle 8" StrokeThickness="0"
-                                            BackgroundColor="#1A1A28" VerticalOptions="Center">
-                                        <Label Text="○ Xa" FontSize="10" TextColor="#444444" VerticalOptions="Center"/>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </VerticalStackLayout>
-
-                <!-- Log label -->
-                <Label Text="📋 Nhật ký" FontSize="11" TextColor="#666666" Margin="14,4,14,4"/>
-
-                <!-- Log items -->
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding LogLines}"
-                                     Margin="10,0,10,8" Spacing="1">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <Label Text="{Binding .}" FontSize="10" TextColor="#3ADB76" Margin="0,1"/>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </VerticalStackLayout>
-
             </VerticalStackLayout>
-        </ScrollView>
+
+            <!-- Button to POI list -->
+            <Button Text="📌 Danh sách điểm"
+                    HorizontalOptions="End" VerticalOptions="End"
+                    Margin="16" HeightRequest="40" CornerRadius="20"
+                    BackgroundColor="#1A1A26" TextColor="White"
+                    BorderColor="#2A2A3A" BorderWidth="1"
+                    FontSize="12" Padding="16,0"
+                    Clicked="OnOpenPoiListClicked" />
+        </Grid>
 
         <!-- Stats bar -->
         <Border Grid.Row="4" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,6">
