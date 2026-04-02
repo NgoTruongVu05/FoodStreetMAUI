@@ -28,6 +28,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string nowPlayingTitle = "Cho kich hoat POI...";
         [ObservableProperty] string nowPlayingDesc = "";
         [ObservableProperty] bool isPlayingAudio = false;
+        [ObservableProperty] bool isPoiModalVisible = false;
         [ObservableProperty] int visitedCount = 0;
         [ObservableProperty] string distanceText = "0 m";
         [ObservableProperty] string sessionTimeText = "00:00";
@@ -145,6 +146,21 @@ namespace FoodStreetMAUI.ViewModels
         }
 
         [RelayCommand]
+        void ShowFullDescription()
+        {
+            if (!string.IsNullOrEmpty(NowPlayingDesc))
+            {
+                IsPoiModalVisible = true;
+            }
+        }
+
+        [RelayCommand]
+        void ClosePoiModal()
+        {
+            IsPoiModalVisible = false;
+        }
+
+        [RelayCommand]
         async Task TeleportToFirstPoiAsync()
         {
             try
@@ -231,9 +247,7 @@ namespace FoodStreetMAUI.ViewModels
                     AddLog((e.EventType == "Enter" ? "DA DEN: " : "GAN DEN: ") + e.Poi.Name + " (" + (int)e.Distance + "m)");
 
                     NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
-                    NowPlayingDesc = content.Description.Length > 100
-                        ? content.Description[..100] + "..."
-                        : content.Description;
+                    NowPlayingDesc = content.Description;
                     IsPlayingAudio = true;
 
                     _audio.Volume = Volume;
