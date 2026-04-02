@@ -10,4 +10,35 @@ public partial class PoiListPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    private void OnPoiTapped(object sender, TappedEventArgs e)
+    {
+        // Lấy thẻ Border đã được click
+        if (sender is Border border)
+        {
+            // Lấy Layout thực tế đang bọc Grid và Label
+            if (border.Content is Layout layout)
+            {
+                // Lấy phần tử con cuối cùng trong Layout (chính là Label mô tả)
+                var descriptionLabel = layout.Children.LastOrDefault() as Label;
+
+                if (descriptionLabel != null)
+                {
+                    // Thay đổi trạng thái ẩn/hiện
+                    descriptionLabel.IsVisible = !descriptionLabel.IsVisible;
+                }
+            }
+        }
+    }
+
+    private void OnPlayAudioTapped(object sender, TappedEventArgs e)
+    {
+        // Ngăn chặn sự kiện click lan ra Border cha (OnPoiTapped)
+        // Lấy thông tin PointOfInterest được click
+        if (sender is BindableObject bindable && bindable.BindingContext is Models.PointOfInterest poi)
+        {
+            // TODO: Thêm logic phát âm thanh cho POI ở đây.
+            // Ví dụ: _audioService.Play(poi);
+        }
+    }
 }

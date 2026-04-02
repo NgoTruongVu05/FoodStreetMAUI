@@ -12,19 +12,33 @@
                 <DataTemplate x:DataType="models:PointOfInterest">
                     <Border Padding="12,10" StrokeShape="RoundRectangle 12"
                             StrokeThickness="0.5" BackgroundColor="#1A1A26" Stroke="#2A2A3A">
-                        <Grid ColumnDefinitions="40,*,Auto">
-                            <Label Grid.Column="0" Text="{Binding Emoji}"
-                                   FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
-                                <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
-                            </VerticalStackLayout>
-                            <Border Grid.Column="2" Padding="8,4"
-                                    StrokeShape="RoundRectangle 8" StrokeThickness="0"
-                                    BackgroundColor="#1A1A28" VerticalOptions="Center">
-                                <Label Text="○ Xa" FontSize="10" TextColor="#444444" VerticalOptions="Center"/>
-                            </Border>
-                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPoiTapped" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout>
+                            <Grid ColumnDefinitions="40,*,Auto">
+                                <Label Grid.Column="0" Text="{Binding Emoji}"
+                                       FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
+                                    <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="2" Padding="12,8"
+                                        StrokeShape="RoundRectangle 8" StrokeThickness="0"
+                                        BackgroundColor="#2A2A3A" VerticalOptions="Center">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPlayAudioTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="🔊" FontSize="14" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Phần mô tả (mặc định ẩn) -->
+                            <Label Text="{Binding Contents[vi].Description}" 
+                                   IsVisible="False" 
+                                   FontSize="12" TextColor="#AAAAAA" 
+                                   Margin="40,8,10,10"/>
+                        </VerticalStackLayout>
                     </Border>
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
