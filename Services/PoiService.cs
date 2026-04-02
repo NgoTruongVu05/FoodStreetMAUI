@@ -62,7 +62,10 @@ namespace FoodStreetMAUI.Services
 
         public PoiService()
         {
-            _httpClient = new HttpClient();
+            _httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(5) // Khắc phục tình trạng treo chờ API quá lâu
+            };
         }
 
         public async Task<List<PoiDto>> GetPoisAsync()
