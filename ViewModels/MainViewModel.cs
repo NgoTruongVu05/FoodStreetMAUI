@@ -27,8 +27,16 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] float volume = 0.8f;
         [ObservableProperty] string nowPlayingTitle = "Cho kich hoat POI...";
         [ObservableProperty] string nowPlayingDesc = "";
+        [ObservableProperty] string selectedPoiTitle = "";
+        [ObservableProperty] string selectedPoiDesc = "";
         [ObservableProperty] bool isPlayingAudio = false;
         [ObservableProperty] bool isPoiModalVisible = false;
+        bool isNowPlayingModalVisible = false;
+        public bool IsNowPlayingModalVisible
+        {
+            get => isNowPlayingModalVisible;
+            set => SetProperty(ref isNowPlayingModalVisible, value);
+        }
         [ObservableProperty] int visitedCount = 0;
         [ObservableProperty] string distanceText = "0 m";
         [ObservableProperty] string sessionTimeText = "00:00";
@@ -150,7 +158,7 @@ namespace FoodStreetMAUI.ViewModels
         {
             if (!string.IsNullOrEmpty(NowPlayingDesc))
             {
-                IsPoiModalVisible = true;
+                IsNowPlayingModalVisible = true;
             }
         }
 
@@ -158,6 +166,12 @@ namespace FoodStreetMAUI.ViewModels
         void ClosePoiModal()
         {
             IsPoiModalVisible = false;
+        }
+
+        [RelayCommand]
+        void CloseNowPlayingModal()
+        {
+            IsNowPlayingModalVisible = false;
         }
 
         [RelayCommand]
