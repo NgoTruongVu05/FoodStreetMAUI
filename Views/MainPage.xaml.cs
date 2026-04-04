@@ -72,6 +72,23 @@ namespace FoodStreetMAUI.Views
             await Navigation.PushAsync(new PoiListPage(_vm));
         }
 
+        private void OnCenterMapClicked(object sender, EventArgs e)
+        {
+            if (_map?.Navigator == null) return;
+
+            var center = GetCenterMPoint();
+            if (center == null) return;
+
+            var idx = System.Math.Min(15, _map.Navigator.Resolutions.Count - 1);
+            _map.Navigator.CenterOnAndZoomTo(center, _map.Navigator.Resolutions[idx], duration: 250);
+
+            // If centering on user, mark as centered so tracking won't re-center repeatedly
+            if (_vm.LastLatitude is double && _vm.LastLongitude is double)
+            {
+                _hasCenteredOnUser = true;
+            }
+        }
+
         private void OnPlaySelectedPoiAudioClicked(object sender, EventArgs e)
         {
             if (_vm.SelectedPoi != null)

@@ -13,7 +13,7 @@
             <Grid ColumnDefinitions="*,Auto">
                 <VerticalStackLayout VerticalOptions="Center">
                     <Label Text="🍜 Food Street Guide" FontSize="15" FontAttributes="Bold" TextColor="#F0A030"/>
-                    <Label Text="Bùi Viện · Thuyết minh tự động" FontSize="10" TextColor="#666666"/>
+                    <Label Text="Thuyết minh tự động" FontSize="10" TextColor="#666666"/>
                 </VerticalStackLayout>
                 <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
                     <Label Text="{Binding GpsStatusText}" FontSize="10" TextColor="#888888" VerticalOptions="Center"/>
@@ -25,15 +25,33 @@
         <Border Grid.Row="1" BackgroundColor="#13131C" Padding="10,6">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" VerticalOptions="Center">
                 <Label Text="Ngôn ngữ:" FontSize="11" TextColor="#888888" VerticalOptions="Center"/>
-                <Border Grid.Column="1" StrokeThickness="0" StrokeShape="RoundRectangle 16" BackgroundColor="#1E1E2E" Padding="8,2">
-                    <Picker ItemsSource="{Binding Languages}"
-                            ItemDisplayBinding="{Binding Label}"
-                            SelectedIndex="0"
-                            TextColor="White"
+                <Grid Grid.Column="1">
+
+                    <Border StrokeThickness="0"
+                            StrokeShape="RoundRectangle 16"
                             BackgroundColor="#1E1E2E"
-                            FontSize="11"
-                            SelectedIndexChanged="OnLanguagePickerChanged" />
-                </Border>
+                            Padding="10,4">
+
+                        <Grid ColumnDefinitions="*,Auto">
+
+                            <!-- Picker -->
+                            <Picker ItemsSource="{Binding Languages}"
+                                    ItemDisplayBinding="{Binding Label}"
+                                    SelectedItem="{Binding SelectedLanguage}"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    SelectedIndexChanged="OnLanguagePickerChanged"/>
+
+                            <!-- Icon dropdown -->
+                            <Label Grid.Column="1"
+                                   Text="▼"
+                                   FontSize="12"
+                                   TextColor="#888888"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,4,0"/>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
         </Border>
 
@@ -85,6 +103,28 @@
                     </Grid>
                 </Border>
             </VerticalStackLayout>
+
+            <!-- Center map button -->
+            <Button x:Name="CenterMapButton"
+                    Text="📍"
+                    FontSize="16"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    CornerRadius="20"
+
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Margin="0,0,12,60"
+
+                    BackgroundColor="#FFFFFF"
+                    TextColor="#1A73E8"
+
+                    Clicked="OnCenterMapClicked">
+
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="1,1" Radius="4" Opacity="0.3"/>
+                </Button.Shadow>
+            </Button>
 
             <!-- Button to POI list -->
             <Button Text="📌 Danh sách điểm"

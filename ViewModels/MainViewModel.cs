@@ -32,6 +32,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] PointOfInterest? selectedPoi;
         [ObservableProperty] bool isPlayingAudio = false;
         [ObservableProperty] bool isPoiModalVisible = false;
+        [ObservableProperty] LanguageItem selectedLanguage;
         bool isNowPlayingModalVisible = false;
         public bool IsNowPlayingModalVisible
         {
@@ -54,12 +55,12 @@ namespace FoodStreetMAUI.ViewModels
         public ObservableCollection<string> LogLines { get; } = new();
         public ObservableCollection<LanguageItem> Languages { get; } = new()
         {
-            new("vi", "VN Viet"),
-            new("en", "US English"),
-            new("zh", "CN Zhongwen"),
-            new("ja", "JP Nihongo"),
-            new("ko", "KR Hanguk"),
-            new("fr", "FR Francais"),
+            new("vi", "(VN) Tiếng Việt"),
+            new("en", "(US) English"),
+            new("zh", "(CN) 汉语"),
+            new("ja", "(JP) 日本語"),
+            new("ko", "(KR) 한국어"),
+            new("fr", "(FR) Français"),
         };
 
         private DateTime _sessionStart;
@@ -86,6 +87,7 @@ namespace FoodStreetMAUI.ViewModels
                 }
             };
             Pois.CollectionChanged += OnPoisCollectionChanged;
+            SelectedLanguage = Languages[0];
         }
 
         public event EventHandler? NearestPoiOrLocationChanged;
@@ -327,6 +329,15 @@ namespace FoodStreetMAUI.ViewModels
             try { _gps.Dispose(); } catch { }
             try { _audio.Dispose(); } catch { }
             try { _sessionTimer?.Stop(); } catch { }
+        }
+
+        partial void OnSelectedLanguageChanged(LanguageItem value)
+        {
+            if (value != null)
+            {
+                CurrentLang = value.Code;
+                AddLog("Ngôn ngữ: " + value.Code.ToUpper());
+            }
         }
     }
 
