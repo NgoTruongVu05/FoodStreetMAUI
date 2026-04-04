@@ -18,14 +18,14 @@ namespace FoodStreetMAUI.ViewModels
         private readonly DataService _data;
 
         [ObservableProperty] string currentLang = "vi";
-        [ObservableProperty] string gpsStatusText = "GPS chua khoi dong";
+        [ObservableProperty] string gpsStatusText = "GPS chưa khởi động";
         [ObservableProperty] string coordinateText = "---";
         [ObservableProperty] string accuracyText = "";
         [ObservableProperty] bool isTracking = false;
         [ObservableProperty] bool isSimulating = false;
         [ObservableProperty] bool isMuted = false;
         [ObservableProperty] float volume = 0.8f;
-        [ObservableProperty] string nowPlayingTitle = "Cho kich hoat POI...";
+        [ObservableProperty] string nowPlayingTitle = "Chờ kích hoạt POI...";
         [ObservableProperty] string nowPlayingDesc = "";
         [ObservableProperty] string selectedPoiTitle = "";
         [ObservableProperty] string selectedPoiDesc = "";
@@ -98,12 +98,12 @@ namespace FoodStreetMAUI.ViewModels
                     Pois.Add(p);
                     _geo.AddPoi(p);
                 }
-                AddLog("Da tai " + pois.Count + " diem thuyet minh");
+                AddLog("Đã tải " + pois.Count + " điểm thuyết minh");
                 NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                AddLog("Loi tai du lieu: " + ex.Message);
+                AddLog("Lỗi tải dữ liệu: " + ex.Message);
             }
         }
 
@@ -128,12 +128,12 @@ namespace FoodStreetMAUI.ViewModels
                     IsTracking = true;
                     StartButtonText = "Tắt GPS";
                     StartButtonColor = "#3a1a1a";
-                    AddLog(IsSimulating ? "Mo phong tour Bui Vien..." : "GPS thuc dang hoat dong...");
+                    AddLog(IsSimulating ? "Mô phỏng tour Bui Vien..." : "GPS thực đang hoạt động...");
                 }
             }
             catch (Exception ex)
             {
-                AddLog("Loi GPS: " + ex.Message);
+                AddLog("Lỗi GPS: " + ex.Message);
             }
         }
 
@@ -141,7 +141,7 @@ namespace FoodStreetMAUI.ViewModels
         void SelectLanguage(string lang)
         {
             CurrentLang = lang;
-            AddLog("Ngon ngu: " + lang.ToUpper());
+            AddLog("Ngôn ngữ: " + lang.ToUpper());
         }
 
         [RelayCommand]
@@ -149,7 +149,7 @@ namespace FoodStreetMAUI.ViewModels
         {
             _audio.StopAll();
             IsPlayingAudio = false;
-            NowPlayingTitle = "Cho kich hoat POI...";
+            NowPlayingTitle = "Chờ kích hoạt POI...";
             NowPlayingDesc = "";
         }
 
@@ -183,11 +183,11 @@ namespace FoodStreetMAUI.ViewModels
                 if (!IsTracking) await ToggleGpsAsync();
                 var poi = Pois[0];
                 _gps.TeleportTo(poi.Location.Latitude, poi.Location.Longitude);
-                AddLog("Teleport den: " + poi.Name);
+                AddLog("Teleport đến: " + poi.Name);
             }
             catch (Exception ex)
             {
-                AddLog("Loi teleport: " + ex.Message);
+                AddLog("Lỗi teleport: " + ex.Message);
             }
         }
 

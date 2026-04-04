@@ -72,6 +72,16 @@ namespace FoodStreetMAUI.Views
             await Navigation.PushAsync(new PoiListPage(_vm));
         }
 
+        private void OnLanguagePickerChanged(object sender, EventArgs e)
+        {
+            if (sender is not Picker picker || picker.SelectedItem is not LanguageItem language)
+            {
+                return;
+            }
+
+            _vm.SelectLanguageCommand.Execute(language.Code);
+        }
+
         private MPoint? GetCenterMPoint()
         {
             if (_vm.LastLatitude is double la && _vm.LastLongitude is double lo)

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FoodStreetMAUI.Models;
@@ -23,11 +22,7 @@ namespace FoodStreetMAUI.Services
         {
             if (IsMuted) return;
             if (priority) StopAll();
-            if (content.ContentType == ContentType.AudioFile
-                && !string.IsNullOrEmpty(content.AudioFilePath))
-                EnqueueAudioFile(content.AudioFilePath);
-            else
-                EnqueueTts(content.Description, content.Language);
+            EnqueueTts(content.Description, content.Language);
         }
 
         public void StopAll()
@@ -42,12 +37,6 @@ namespace FoodStreetMAUI.Services
         private void EnqueueTts(string text, string lang)
         {
             _queue.Enqueue(() => SpeakAsync(text, lang));
-            if (!_processingQueue) _ = ProcessQueueAsync();
-        }
-
-        private void EnqueueAudioFile(string path)
-        {
-            _queue.Enqueue(() => PlayFileAsync(path));
             if (!_processingQueue) _ = ProcessQueueAsync();
         }
 
@@ -96,20 +85,6 @@ namespace FoodStreetMAUI.Services
             }
             catch { }
             return null;
-        }
-
-        private async Task PlayFileAsync(string path)
-        {
-            if (!File.Exists(path))
-            {
-                StatusChanged?.Invoke(this, "File khong ton tai: " + Path.GetFileName(path));
-                return;
-            }
-            IsPlaying = true;
-            StatusChanged?.Invoke(this, "Dang phat: " + Path.GetFileName(path));
-            try { await Task.Delay(3000, _cts.Token); }
-            catch (TaskCanceledException) { }
-            finally { IsPlaying = false; StatusChanged?.Invoke(this, "Phat xong"); }
         }
 
         public void Dispose() => StopAll();

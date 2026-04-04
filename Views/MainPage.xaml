@@ -22,27 +22,20 @@
         </Border>
 
         <!-- Language selector -->
-        <ScrollView Grid.Row="1" Orientation="Horizontal"
-                    HorizontalScrollBarVisibility="Never"
-                    BackgroundColor="#13131C">
-            <HorizontalStackLayout Padding="10,8" Spacing="8"
-                                   BindableLayout.ItemsSource="{Binding Languages}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:LanguageItem">
-                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 20"
-                                BackgroundColor="#1E1E2E" Padding="10,5">
-                            <Label Text="{Binding Label}" FontSize="11" TextColor="White">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectLanguageCommand}"
-                                        CommandParameter="{Binding Code}"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                        </Border>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </HorizontalStackLayout>
-        </ScrollView>
+        <Border Grid.Row="1" BackgroundColor="#13131C" Padding="10,6">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" VerticalOptions="Center">
+                <Label Text="Ngôn ngữ:" FontSize="11" TextColor="#888888" VerticalOptions="Center"/>
+                <Border Grid.Column="1" StrokeThickness="0" StrokeShape="RoundRectangle 16" BackgroundColor="#1E1E2E" Padding="8,2">
+                    <Picker ItemsSource="{Binding Languages}"
+                            ItemDisplayBinding="{Binding Label}"
+                            SelectedIndex="0"
+                            TextColor="White"
+                            BackgroundColor="#1E1E2E"
+                            FontSize="11"
+                            SelectedIndexChanged="OnLanguagePickerChanged" />
+                </Border>
+            </Grid>
+        </Border>
 
         <!-- GPS coords bar -->
         <Border Grid.Row="2" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,5">
