@@ -31,14 +31,15 @@ public partial class PoiListPage : ContentPage
         }
     }
 
-    private void OnPlayAudioTapped(object sender, TappedEventArgs e)
+    private void OnPlayAudioTapped(object sender, EventArgs e)
     {
         // Ngăn chặn sự kiện click lan ra Border cha (OnPoiTapped)
         // Lấy thông tin PointOfInterest được click
-        if (sender is BindableObject bindable && bindable.BindingContext is Models.PointOfInterest poi)
+        if (sender is BindableObject bindable
+            && bindable.BindingContext is Models.PointOfInterest poi
+            && BindingContext is MainViewModel vm)
         {
-            // TODO: Thêm logic phát âm thanh cho POI ở đây.
-            // Ví dụ: _audioService.Play(poi);
+            vm.PlayPoiAudio(poi);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string nowPlayingDesc = "";
         [ObservableProperty] string selectedPoiTitle = "";
         [ObservableProperty] string selectedPoiDesc = "";
+        [ObservableProperty] PointOfInterest? selectedPoi;
         [ObservableProperty] bool isPlayingAudio = false;
         [ObservableProperty] bool isPoiModalVisible = false;
         bool isNowPlayingModalVisible = false;
@@ -76,7 +77,14 @@ namespace FoodStreetMAUI.ViewModels
             _gps.StatusChanged += OnGpsStatusChanged;
             _geo.GeofenceTriggered += OnGeofenceTriggered;
             _geo.LogMessage += (s, m) => AddLog(m);
-            _audio.StatusChanged += (s, m) => AddLog(m);
+            _audio.StatusChanged += (s, m) =>
+            {
+                AddLog(m);
+                if (m == "Phat xong")
+                {
+                    IsPlayingAudio = false;
+                }
+            };
             Pois.CollectionChanged += OnPoisCollectionChanged;
         }
 
@@ -273,6 +281,19 @@ namespace FoodStreetMAUI.ViewModels
                     AddLog("Loi geofence: " + ex.Message);
                 }
             });
+
+        public void PlayPoiAudio(PointOfInterest poi)
+        {
+            var content = poi.GetContent(CurrentLang);
+            if (content == null) return;
+
+            NowPlayingTitle = poi.Emoji + " " + content.Title;
+            NowPlayingDesc = content.Description;
+            IsPlayingAudio = true;
+
+            _audio.Volume = Volume;
+            _audio.PlayContent(content, priority: true);
+        }
 
         private void StartSessionTimer()
         {

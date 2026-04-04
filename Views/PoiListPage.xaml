@@ -5,41 +5,63 @@
              x:Class="FoodStreetMAUI.Views.PoiListPage"
              Title="Điểm thuyết minh"
              BackgroundColor="#0F0F16">
-    <ScrollView BackgroundColor="#0F0F16">
-        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Pois}"
-                             Margin="10,10,10,10" Spacing="6">
-            <BindableLayout.ItemTemplate>
-                <DataTemplate x:DataType="models:PointOfInterest">
-                    <Border Padding="12,10" StrokeShape="RoundRectangle 12"
-                            StrokeThickness="0.5" BackgroundColor="#1A1A26" Stroke="#2A2A3A">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnPoiTapped" />
-                        </Border.GestureRecognizers>
-                        <VerticalStackLayout>
-                            <Grid ColumnDefinitions="40,*,Auto">
-                                <Label Grid.Column="0" Text="{Binding Emoji}"
-                                       FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
-                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                    <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
-                                    <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
-                                </VerticalStackLayout>
-                                <Button Grid.Column="2" Text="🔊" FontSize="16"
-                                        BackgroundColor="#F0A030" TextColor="#0F0F16"
-                                        BorderColor="#F8C070" BorderWidth="1"
-                                        CornerRadius="12" HeightRequest="36" WidthRequest="36"
-                                        Padding="0" VerticalOptions="Center"
-                                        Clicked="OnPlayAudioTapped" />
-                            </Grid>
+    <Grid RowDefinitions="Auto,*" BackgroundColor="#0F0F16">
+        <!-- Now playing banner -->
+        <Border Grid.Row="0" Margin="10,10,10,0" BackgroundColor="#1F1A10"
+                Stroke="#F0A030" StrokeThickness="0.5"
+                StrokeShape="RoundRectangle 12" Padding="12,10"
+                IsVisible="{Binding IsPlayingAudio}">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="🔊 Đang phát thuyết minh" FontSize="10" TextColor="#F0A030"/>
+                    <Label Text="{Binding NowPlayingTitle}" FontSize="13" FontAttributes="Bold"
+                           TextColor="#E8E0D0" LineBreakMode="TailTruncation"/>
+                    <Label Text="{Binding NowPlayingDesc}" FontSize="11" TextColor="#999999"
+                           LineBreakMode="TailTruncation" MaxLines="2"/>
+                </VerticalStackLayout>
+                <Button Grid.Column="1" Text="⏹ Dừng" FontSize="12" FontAttributes="Bold" VerticalOptions="Center"
+                        BackgroundColor="#E03030" TextColor="#FFFFFF"
+                        HeightRequest="40" CornerRadius="8" Padding="12,0"
+                        Command="{Binding StopAudioCommand}"/>
+            </Grid>
+        </Border>
 
-                            <!-- Phần mô tả (mặc định ẩn) -->
-                            <Label Text="{Binding Contents[vi].Description}" 
-                                   IsVisible="False" 
-                                   FontSize="12" TextColor="#AAAAAA" 
-                                   Margin="40,8,10,10"/>
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
-        </VerticalStackLayout>
-    </ScrollView>
+        <ScrollView Grid.Row="1" BackgroundColor="#0F0F16">
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Pois}"
+                                 Margin="10,10,10,10" Spacing="6">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:PointOfInterest">
+                        <Border Padding="12,10" StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0.5" BackgroundColor="#1A1A26" Stroke="#2A2A3A">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPoiTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Grid ColumnDefinitions="40,*,Auto">
+                                    <Label Grid.Column="0" Text="{Binding Emoji}"
+                                           FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
+                                        <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="2" Text="🔊" FontSize="16"
+                                            BackgroundColor="#F0A030" TextColor="#0F0F16"
+                                            BorderColor="#F8C070" BorderWidth="1"
+                                            CornerRadius="12" HeightRequest="36" WidthRequest="36"
+                                            Padding="0" VerticalOptions="Center"
+                                            Clicked="OnPlayAudioTapped" />
+                                </Grid>
+
+                                <!-- Phần mô tả (mặc định ẩn) -->
+                                <Label Text="{Binding Contents[vi].Description}" 
+                                       IsVisible="False" 
+                                       FontSize="12" TextColor="#AAAAAA" 
+                                       Margin="40,8,10,10"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

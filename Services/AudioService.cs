@@ -42,16 +42,20 @@ namespace FoodStreetMAUI.Services
 
         private async Task ProcessQueueAsync()
         {
+            var token = _cts.Token;
             _processingQueue = true;
+            IsPlaying = true;
             while (_queue.Count > 0)
                 await _queue.Dequeue()();
             _processingQueue = false;
+            IsPlaying = false;
+            if (!token.IsCancellationRequested)
+                StatusChanged?.Invoke(this, "Phat xong");
         }
 
         private async Task SpeakAsync(string text, string lang)
         {
             if (string.IsNullOrWhiteSpace(text)) return;
-            IsPlaying = true;
             StatusChanged?.Invoke(this, text.Length > 40 ? text[..40] + "..." : text);
             try
             {
@@ -65,7 +69,6 @@ namespace FoodStreetMAUI.Services
             }
             catch (TaskCanceledException) { }
             catch (Exception ex) { StatusChanged?.Invoke(this, "TTS loi: " + ex.Message); }
-            finally { IsPlaying = false; StatusChanged?.Invoke(this, "Phat xong"); }
         }
 
         private static async Task<Locale?> GetLocaleAsync(string lang)

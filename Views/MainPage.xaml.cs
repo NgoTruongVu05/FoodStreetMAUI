@@ -72,6 +72,14 @@ namespace FoodStreetMAUI.Views
             await Navigation.PushAsync(new PoiListPage(_vm));
         }
 
+        private void OnPlaySelectedPoiAudioClicked(object sender, EventArgs e)
+        {
+            if (_vm.SelectedPoi != null)
+            {
+                _vm.PlayPoiAudio(_vm.SelectedPoi);
+            }
+        }
+
         private void OnLanguagePickerChanged(object sender, EventArgs e)
         {
             if (sender is not Picker picker || picker.SelectedItem is not LanguageItem language)
@@ -243,6 +251,7 @@ namespace FoodStreetMAUI.Views
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 var content = poi.GetContent(_vm.CurrentLang);
+                _vm.SelectedPoi = poi;
                 _vm.SelectedPoiTitle = string.IsNullOrWhiteSpace(content?.Title)
                     ? poi.DisplayName
                     : $"{poi.Emoji} {content!.Title}";
