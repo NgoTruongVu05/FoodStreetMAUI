@@ -270,6 +270,7 @@ namespace FoodStreetMAUI.ViewModels
 
                     AddLog((e.EventType == "Enter" ? "DA DEN: " : "GAN DEN: ") + e.Poi.Name + " (" + (int)e.Distance + "m)");
 
+                    SelectedPoi = e.Poi;
                     NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
                     NowPlayingDesc = content.Description;
                     IsPlayingAudio = true;
@@ -286,6 +287,8 @@ namespace FoodStreetMAUI.ViewModels
 
         public void PlayPoiAudio(PointOfInterest poi)
         {
+            SelectedPoi = poi;
+
             var content = poi.GetContent(CurrentLang);
             if (content == null) return;
 
@@ -337,6 +340,20 @@ namespace FoodStreetMAUI.ViewModels
             {
                 CurrentLang = value.Code;
                 AddLog("Ngôn ngữ: " + value.Code.ToUpper());
+            }
+
+            // Nếu đang có POI đang phát → đổi ngôn ngữ ngay
+            if (SelectedPoi != null)
+            {
+                var content = SelectedPoi.GetContent(CurrentLang);
+                if (content != null)
+                {
+                    NowPlayingTitle = SelectedPoi.Emoji + " " + content.Title;
+                    NowPlayingDesc = content.Description;
+
+                    _audio.StopAll();
+                    _audio.PlayContent(content, priority: true);
+                }
             }
         }
     }
