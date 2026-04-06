@@ -60,6 +60,7 @@ ehthumbs.db
 
 # Secrets
 secrets.json
+Configuration/SupabaseSecrets.cs
 
 # Cache
 *.cache

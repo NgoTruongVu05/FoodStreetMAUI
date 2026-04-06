@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using FoodStreetMAUI.Configuration;
 
 namespace FoodStreetMAUI.Services
 {
@@ -76,11 +77,9 @@ namespace FoodStreetMAUI.Services
             try
             {
                 _httpClient.Timeout = TimeSpan.FromSeconds(15);
-                var supabaseUrl = "";
-                var supabaseApiKey = "";
-                var request = new HttpRequestMessage(HttpMethod.Get, $"{supabaseUrl}/rest/v1/pois?select=*");
-                request.Headers.Add("apikey", supabaseApiKey);
-                request.Headers.Add("Authorization", $"Bearer {supabaseApiKey}");
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{SupabaseSecrets.Url}/rest/v1/pois?select=*");
+                request.Headers.Add("apikey", SupabaseSecrets.ApiKey);
+                request.Headers.Add("Authorization", $"Bearer {SupabaseSecrets.ApiKey}");
                 request.Headers.Add("Accept", "application/json");
 
                 var response = await _httpClient.SendAsync(request);

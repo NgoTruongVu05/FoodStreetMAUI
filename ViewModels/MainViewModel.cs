@@ -2,6 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FoodStreetMAUI.Models;
@@ -16,6 +17,7 @@ namespace FoodStreetMAUI.ViewModels
         private readonly GeofenceService _geo;
         private readonly AudioService _audio;
         private readonly DataService _data;
+        private readonly LanguageService _languageService;
 
         [ObservableProperty] string currentLang = "vi";
         [ObservableProperty] string gpsStatusText = "GPS chưa khởi động";
@@ -53,15 +55,7 @@ namespace FoodStreetMAUI.ViewModels
 
         public ObservableCollection<PointOfInterest> Pois { get; } = new();
         public ObservableCollection<string> LogLines { get; } = new();
-        public ObservableCollection<LanguageItem> Languages { get; } = new()
-        {
-            new("vi", "(VN) Tiếng Việt"),
-            new("en", "(US) English"),
-            new("zh", "(CN) 汉语"),
-            new("ja", "(JP) 日本語"),
-            new("ko", "(KR) 한국어"),
-            new("fr", "(FR) Français"),
-        };
+        public ObservableCollection<LanguageItem> Languages { get; } = new();
 
         private DateTime _sessionStart;
         private System.Timers.Timer? _sessionTimer;
@@ -73,6 +67,7 @@ namespace FoodStreetMAUI.ViewModels
             _geo = geo;
             _audio = audio;
             _data = data;
+            _languageService = new LanguageService();
 
             _gps.LocationUpdated += OnLocationUpdated;
             _gps.StatusChanged += OnGpsStatusChanged;
@@ -87,7 +82,7 @@ namespace FoodStreetMAUI.ViewModels
                 }
             };
             Pois.CollectionChanged += OnPoisCollectionChanged;
-            SelectedLanguage = Languages[0];
+            SelectedLanguage = new LanguageItem(string.Empty, string.Empty);
         }
 
         public event EventHandler? NearestPoiOrLocationChanged;
@@ -109,11 +104,51 @@ namespace FoodStreetMAUI.ViewModels
                     _geo.AddPoi(p);
                 }
                 AddLog("Đã tải " + pois.Count + " điểm thuyết minh");
+                await LoadLanguagesAsync();
                 NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
                 AddLog("Lỗi tải dữ liệu: " + ex.Message);
+            }
+        }
+
+        private async Task LoadLanguagesAsync()
+        {
+            try
+            {
+                var languages = await _languageService.GetLanguagesAsync();
+                if (languages.Count == 0)
+                {
+                    return;
+                }
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Languages.Clear();
+                    foreach (var language in languages)
+                    {
+                        if (string.IsNullOrWhiteSpace(language?.Code))
+                        {
+                            continue;
+                        }
+
+                        var label = string.IsNullOrWhiteSpace(language.Name)
+                            ? language.Code
+                            : $"({language.Code.ToUpperInvariant()}) {language.Name}";
+
+                        Languages.Add(new LanguageItem(language.Code, label));
+                    }
+
+                    if (Languages.Count > 0)
+                    {
+                        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == CurrentLang) ?? Languages[0];
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                AddLog("Lỗi tải ngôn ngữ: " + ex.Message);
             }
         }
 
