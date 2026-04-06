@@ -187,6 +187,18 @@ namespace FoodStreetMAUI.ViewModels
         {
             CurrentLang = string.IsNullOrWhiteSpace(lang) ? "vi" : lang;
             AddLog("Ngôn ngữ: " + CurrentLang.ToUpper());
+            // Nếu đang phát audio thì dừng và xóa thông tin hiển thị
+            try
+            {
+                _audio.StopAll();
+            }
+            catch { }
+            IsPlayingAudio = false;
+            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingDesc = "";
+            SelectedPoi = null;
+            IsNowPlayingModalVisible = false;
+            IsPoiModalVisible = false;
         }
 
         [RelayCommand]
@@ -377,7 +389,17 @@ namespace FoodStreetMAUI.ViewModels
                 AddLog("Ngôn ngữ: " + CurrentLang.ToUpper());
             }
 
-            _audio.StopAll();
+            try
+            {
+                _audio.StopAll();
+            }
+            catch { }
+            IsPlayingAudio = false;
+            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingDesc = "";
+            SelectedPoi = null;
+            IsNowPlayingModalVisible = false;
+            IsPoiModalVisible = false;
         }
     }
 
