@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FoodStreetMAUI.Models;
 using Newtonsoft.Json;
@@ -20,6 +21,12 @@ namespace FoodStreetMAUI.Services
             if (_db != null) return;
             _db = new SQLiteAsyncConnection(PoiDbPath);
             await _db.CreateTableAsync<PoiEntity>();
+
+            var columns = await _db.QueryAsync<TableInfo>("PRAGMA table_info(PoiEntity);");
+            if (!columns.Any(c => string.Equals(c.Name, nameof(PoiEntity.ImageUrl), StringComparison.OrdinalIgnoreCase)))
+            {
+                await _db.ExecuteAsync($"ALTER TABLE {nameof(PoiEntity)} ADD COLUMN {nameof(PoiEntity.ImageUrl)} TEXT");
+            }
         }
 
         public async Task<List<PointOfInterest>> LoadPoisAsync()
@@ -42,7 +49,8 @@ namespace FoodStreetMAUI.Services
                         {
                             Id = Guid.TryParse(entity.Id, out var guid) ? guid : Guid.NewGuid(),
                             Name = entity.Name ?? "",
-                            Category = entity.Category ?? "Ẩm thực",
+                            Category = entity.Category ?? "",
+                            ImageUrl = entity.ImageUrl ?? "",
                             Location = new GpsCoordinate(entity.Lat, entity.Lng),
                             TriggerRadius = 25,
                             ApproachRadius = 70,
@@ -83,6 +91,7 @@ namespace FoodStreetMAUI.Services
                         Name = p.Name,
                         Description = desc,
                         Category = p.Category,
+                        ImageUrl = p.ImageUrl,
                         Lat = p.Location.Latitude,
                         Lng = p.Location.Longitude
                     });
@@ -112,7 +121,8 @@ namespace FoodStreetMAUI.Services
                             Id = dto.Id ?? Guid.NewGuid().ToString(), 
                             Name = dto.Name,
                             Description = dto.Description,
-                            Category = dto.CategoryName ?? dto.CategoryId ?? "Ẩm thực",
+                            Category = string.Empty,
+                            ImageUrl = dto.ImageUrl,
                             Lat = dto.Lat,
                             Lng = dto.Lng
                         });
@@ -133,8 +143,15 @@ namespace FoodStreetMAUI.Services
             public string Name { get; set; }
             public string Description { get; set; }
             public string Category { get; set; }
+            public string ImageUrl { get; set; }
             public double Lat { get; set; }
             public double Lng { get; set; }
+        }
+
+        private sealed class TableInfo
+        {
+            [SQLite.Column("name")]
+            public string Name { get; set; }
         }
     }
 }

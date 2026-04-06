@@ -38,11 +38,11 @@
                             </Border.GestureRecognizers>
                             <VerticalStackLayout>
                                 <Grid ColumnDefinitions="40,*,Auto">
-                                    <Label Grid.Column="0" Text="{Binding Emoji}"
-                                           FontSize="22" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                    <Image Grid.Column="0" Source="{Binding ImageUrl}"
+                                           HeightRequest="32" WidthRequest="32" Aspect="AspectFill"
+                                           VerticalOptions="Center" HorizontalOptions="Center"/>
                                     <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                         <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
-                                        <Label Text="{Binding Category}" FontSize="11" TextColor="#555555"/>
                                     </VerticalStackLayout>
                                     <Button Grid.Column="2" Text="🔊" FontSize="16"
                                             BackgroundColor="#F0A030" TextColor="#0F0F16"

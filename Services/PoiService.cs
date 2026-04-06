@@ -48,6 +48,9 @@ namespace FoodStreetMAUI.Services
         [JsonPropertyName("categoryColor")]
         public string CategoryColor { get; set; }
 
+        [JsonPropertyName("image")]
+        public string ImageUrl { get; set; }
+
         [JsonPropertyName("lat")]
         public double Lat { get; set; }
 
@@ -58,7 +61,7 @@ namespace FoodStreetMAUI.Services
     public class PoiService
     {
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "http://10.0.2.2/POI_Admin/api/index.php/";
+        private const string BaseUrl = "https://poiadmin.rf.gd/api/index.php/";
 
         public PoiService()
         {
