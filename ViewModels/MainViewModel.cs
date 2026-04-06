@@ -185,8 +185,9 @@ namespace FoodStreetMAUI.ViewModels
         [RelayCommand]
         void SelectLanguage(string lang)
         {
-            CurrentLang = lang;
-            AddLog("Ngôn ngữ: " + lang.ToUpper());
+            var normalized = string.IsNullOrWhiteSpace(lang) ? "vi" : lang.ToLowerInvariant();
+            CurrentLang = normalized;
+            AddLog("Ngôn ngữ: " + normalized.ToUpper());
         }
 
         [RelayCommand]
@@ -373,8 +374,9 @@ namespace FoodStreetMAUI.ViewModels
         {
             if (value != null)
             {
-                CurrentLang = value.Code;
-                AddLog("Ngôn ngữ: " + value.Code.ToUpper());
+                var normalized = string.IsNullOrWhiteSpace(value.Code) ? "vi" : value.Code.ToLowerInvariant();
+                CurrentLang = normalized;
+                AddLog("Ngôn ngữ: " + normalized.ToUpper());
             }
 
             // Nếu đang có POI đang phát → đổi ngôn ngữ ngay
@@ -385,6 +387,13 @@ namespace FoodStreetMAUI.ViewModels
                 {
                     NowPlayingTitle = SelectedPoi.Emoji + " " + content.Title;
                     NowPlayingDesc = content.Description;
+
+                    SelectedPoiTitle = string.IsNullOrWhiteSpace(content.Title)
+                        ? SelectedPoi.DisplayName
+                        : SelectedPoi.Emoji + " " + content.Title;
+                    SelectedPoiDesc = string.IsNullOrWhiteSpace(content.Description)
+                        ? string.Empty
+                        : content.Description;
 
                     _audio.StopAll();
                     _audio.PlayContent(content, priority: true);

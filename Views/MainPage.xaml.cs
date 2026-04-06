@@ -273,7 +273,7 @@ namespace FoodStreetMAUI.Views
                     ? poi.DisplayName
                     : $"{poi.Emoji} {content!.Title}";
                 _vm.SelectedPoiDesc = string.IsNullOrWhiteSpace(content?.Description)
-                    ? poi.Name
+                    ? string.Empty
                     : content!.Description;
                 _vm.IsPoiModalVisible = true;
             });

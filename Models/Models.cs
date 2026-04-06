@@ -83,8 +83,31 @@ namespace FoodStreetMAUI.Models
 
         public LocalizedContent? GetContent(string lang)
         {
+            if (string.IsNullOrWhiteSpace(lang))
+            {
+                lang = "vi";
+            }
+
             if (Contents.TryGetValue(lang, out var c)) return c;
+
+            foreach (var kvp in Contents)
+            {
+                if (string.Equals(kvp.Key, lang, StringComparison.OrdinalIgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+
             if (Contents.TryGetValue("vi", out var fallback)) return fallback;
+
+            foreach (var kvp in Contents)
+            {
+                if (string.Equals(kvp.Key, "vi", StringComparison.OrdinalIgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+
             return null;
         }
 
