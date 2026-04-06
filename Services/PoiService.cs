@@ -75,23 +75,40 @@ namespace FoodStreetMAUI.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{BaseUrl}pois");
+                _httpClient.Timeout = TimeSpan.FromSeconds(15);
+                var supabaseUrl = "";
+                var supabaseApiKey = "";
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{supabaseUrl}/rest/v1/pois?select=*");
+                request.Headers.Add("apikey", supabaseApiKey);
+                request.Headers.Add("Authorization", $"Bearer {supabaseApiKey}");
+                request.Headers.Add("Accept", "application/json");
+
+                var response = await _httpClient.SendAsync(request);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var result = JsonSerializer.Deserialize<ApiResponse<List<PoiDto>>>(content);
-                    
-                    if (result != null && result.Ok)
+                    var result = JsonSerializer.Deserialize<List<PoiDto>>(content, new JsonSerializerOptions
                     {
-                        return result.Data;
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (result != null)
+                    {
+                        return result;
                     }
+                    System.Diagnostics.Debug.WriteLine("Supabase returned empty or invalid JSON payload.");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"Supabase response {(int)response.StatusCode} {response.ReasonPhrase}: {errorContent}");
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error fetching POIs: {ex.Message}");
             }
-            
+
             return new List<PoiDto>();
         }
     }
