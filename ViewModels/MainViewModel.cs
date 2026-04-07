@@ -133,9 +133,11 @@ namespace FoodStreetMAUI.ViewModels
                             continue;
                         }
 
+                        // Show only the language name in the picker (do not display the code).
+                        // If Name is missing, fall back to Code to avoid an empty entry.
                         var label = string.IsNullOrWhiteSpace(language.Name)
                             ? language.Code
-                            : $"({language.Code.ToUpperInvariant()}) {language.Name}";
+                            : language.Name;
 
                         Languages.Add(new LanguageItem(language.Code, label));
                     }
