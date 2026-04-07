@@ -42,4 +42,14 @@ public partial class PoiListPage : ContentPage
             vm.PlayPoiAudio(poi);
         }
     }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        if (BindingContext is MainViewModel vm)
+        {
+            vm.StopAudio(); // gọi hàm dừng audio
+        }
+    }
 }

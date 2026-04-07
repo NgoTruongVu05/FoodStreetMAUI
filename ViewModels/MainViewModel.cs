@@ -187,13 +187,24 @@ namespace FoodStreetMAUI.ViewModels
         [RelayCommand]
         void SelectLanguage(string lang)
         {
-            var normalized = string.IsNullOrWhiteSpace(lang) ? "vi" : lang.ToLowerInvariant();
-            CurrentLang = normalized;
-            AddLog("Ngôn ngữ: " + normalized.ToUpper());
+            CurrentLang = string.IsNullOrWhiteSpace(lang) ? "vi" : lang;
+            AddLog("Ngôn ngữ: " + CurrentLang.ToUpper());
+            // Nếu đang phát audio thì dừng và xóa thông tin hiển thị
+            try
+            {
+                _audio.StopAll();
+            }
+            catch { }
+            IsPlayingAudio = false;
+            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingDesc = "";
+            SelectedPoi = null;
+            IsNowPlayingModalVisible = false;
+            IsPoiModalVisible = false;
         }
 
         [RelayCommand]
-        void StopAudio()
+        public void StopAudio()
         {
             _audio.StopAll();
             IsPlayingAudio = false;
@@ -376,31 +387,21 @@ namespace FoodStreetMAUI.ViewModels
         {
             if (value != null)
             {
-                var normalized = string.IsNullOrWhiteSpace(value.Code) ? "vi" : value.Code.ToLowerInvariant();
-                CurrentLang = normalized;
-                AddLog("Ngôn ngữ: " + normalized.ToUpper());
+                CurrentLang = string.IsNullOrWhiteSpace(value.Code) ? "vi" : value.Code;
+                AddLog("Ngôn ngữ: " + CurrentLang.ToUpper());
             }
 
-            // Nếu đang có POI đang phát → đổi ngôn ngữ ngay
-            if (SelectedPoi != null)
+            try
             {
-                var content = SelectedPoi.GetContent(CurrentLang);
-                if (content != null)
-                {
-                    NowPlayingTitle = SelectedPoi.Emoji + " " + content.Title;
-                    NowPlayingDesc = content.Description;
-
-                    SelectedPoiTitle = string.IsNullOrWhiteSpace(content.Title)
-                        ? SelectedPoi.DisplayName
-                        : SelectedPoi.Emoji + " " + content.Title;
-                    SelectedPoiDesc = string.IsNullOrWhiteSpace(content.Description)
-                        ? string.Empty
-                        : content.Description;
-
-                    _audio.StopAll();
-                    _audio.PlayContent(content, priority: true);
-                }
+                _audio.StopAll();
             }
+            catch { }
+            IsPlayingAudio = false;
+            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingDesc = "";
+            SelectedPoi = null;
+            IsNowPlayingModalVisible = false;
+            IsPoiModalVisible = false;
         }
     }
 
