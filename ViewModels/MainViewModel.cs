@@ -59,6 +59,8 @@ namespace FoodStreetMAUI.ViewModels
 
         private DateTime _sessionStart;
         private System.Timers.Timer? _sessionTimer;
+        private readonly object _locSync = new();
+        private GpsCoordinate? _latestLocation;
 
         public MainViewModel(GpsService gps, GeofenceService geo,
                              AudioService audio, DataService data)
@@ -252,8 +254,10 @@ namespace FoodStreetMAUI.ViewModels
 
         private void OnLocationUpdated(object? sender, GpsUpdateEventArgs e)
         {
+            lock (_locSync) { _latestLocation = e.Location; }
             // Cập nhật geofence NGAY (không cần main thread)
-            try { _geo.UpdateLocation(e.Location); } catch { }
+            try { _geo.UpdateLocation(e.Location); }
+            catch (Exception ex) { AddLog("Loi geofence update: " + ex.Message); }
 
             var loc = e.Location;
             var nearby = _geo.GetNearby(loc, maxDist: 1_000_000);
@@ -317,22 +321,59 @@ namespace FoodStreetMAUI.ViewModels
                     var content = e.Poi.GetContent(CurrentLang);
                     if (content == null) return;
 
-                    AddLog((e.EventType == "Enter" ? "DA DEN: " : "GAN DEN: ") + e.Poi.Name + " (" + (int)e.Distance + "m)");
+                    AddLog((e.EventType == "Enter" || e.EventType == "EnterFollow" ? "DA DEN: " : "GAN DEN: ") + e.Poi.Name + " (" + (int)e.Distance + "m)");
 
-                    SelectedPoi = e.Poi;
-                    NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
-                    NowPlayingDesc = content.Description;
-                    IsPlayingAudio = true;
+                    // For the first Enter we want to immediately update UI and play with priority.
+                    if (e.EventType == "Enter")
+                    {
+                        SelectedPoi = e.Poi;
+                        NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
+                        NowPlayingDesc = content.Description;
+                        IsPlayingAudio = true;
 
-                    _audio.Volume = Volume;
-                    _audio.PlayContent(content, priority: e.EventType == "Enter");
-                    VisitedCount++;
+                        _audio.Volume = Volume;
+                        _audio.PlayContent(
+                            content,
+                            priority: false,
+                            tag: e.Poi.Id.ToString());
+                        VisitedCount++;
+                    }
+                    else if (e.EventType == "Approach")
+                    {
+                        // Queue approach audio; when it starts, update the NowPlaying UI to reflect this poi
+                        _audio.Volume = Volume;
+                        _audio.PlayContent(
+                            content,
+                            priority: false,
+                            onStart: () =>
+                            {
+                                MainThread.BeginInvokeOnMainThread(() =>
+                                {
+                                    SelectedPoi = e.Poi;
+                                    NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
+                                    NowPlayingDesc = content.Description;
+                                    IsPlayingAudio = true;
+                                });
+                            },
+                            tag: e.Poi.Id.ToString(),
+                            shouldStart: () => IsPoiStillRelevant(e.Poi));
+                    }
                 }
                 catch (Exception ex)
                 {
                     AddLog("Loi geofence: " + ex.Message);
                 }
             });
+
+        private bool IsPoiStillRelevant(PointOfInterest poi)
+        {
+            GpsCoordinate? loc;
+            lock (_locSync) { loc = _latestLocation; }
+            if (loc == null) return true;
+            var dist = loc.DistanceTo(poi.Location);
+            var keepRadius = Math.Max(poi.TriggerRadius * 1.3, poi.ApproachRadius * 1.1);
+            return dist <= keepRadius;
+        }
 
         public void PlayPoiAudio(PointOfInterest poi)
         {
@@ -346,7 +387,7 @@ namespace FoodStreetMAUI.ViewModels
             IsPlayingAudio = true;
 
             _audio.Volume = Volume;
-            _audio.PlayContent(content, priority: true);
+            _audio.PlayContent(content, priority: true, tag: poi.Id.ToString());
         }
 
         private void StartSessionTimer()

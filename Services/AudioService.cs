@@ -16,13 +16,15 @@ namespace FoodStreetMAUI.Services
 
         private CancellationTokenSource _cts = new();
         private readonly Queue<Func<Task>> _queue = new();
+        private readonly HashSet<string> _queuedTags = new();
         private bool _processingQueue = false;
+        private readonly object _tagSync = new();
 
-        public void PlayContent(LocalizedContent content, bool priority = false)
+        public void PlayContent(LocalizedContent content, bool priority = false, Action? onStart = null, string? tag = null, Func<bool>? shouldStart = null)
         {
             if (IsMuted) return;
             if (priority) StopAll();
-            EnqueueTts(content.Description, content.Language);
+            EnqueueTts(content.Description, content.Language, onStart, tag, shouldStart);
         }
 
         public void StopAll()
@@ -30,13 +32,52 @@ namespace FoodStreetMAUI.Services
             _cts.Cancel();
             _cts = new CancellationTokenSource();
             _queue.Clear();
+            lock (_tagSync)
+            {
+                _queuedTags.Clear();
+            }
             IsPlaying = false;
             StatusChanged?.Invoke(this, "Đã dừng");
         }
 
-        private void EnqueueTts(string text, string lang)
+        private void EnqueueTts(string text, string lang, Action? onStart, string? tag, Func<bool>? shouldStart)
         {
-            _queue.Enqueue(() => SpeakAsync(text, lang));
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                // If already queued/playing this tag, skip to avoid duplicates
+                lock (_tagSync)
+                {
+                    if (_queuedTags.Contains(tag)) return;
+                    _queuedTags.Add(tag);
+                }
+            }
+
+            _queue.Enqueue(async () =>
+            {
+                if (shouldStart != null)
+                {
+                    bool okToStart;
+                    try { okToStart = shouldStart(); }
+                    catch { okToStart = true; }
+                    if (!okToStart)
+                    {
+                        StatusChanged?.Invoke(this, "Bỏ qua audio không còn phù hợp");
+                        return;
+                    }
+                }
+                try { onStart?.Invoke(); } catch { }
+                try
+                {
+                    await SpeakAsync(text, lang);
+                }
+                finally
+                {
+                    if (!string.IsNullOrWhiteSpace(tag))
+                    {
+                        try { lock (_tagSync) { _queuedTags.Remove(tag); } } catch { }
+                    }
+                }
+            });
             if (!_processingQueue) _ = ProcessQueueAsync();
         }
 

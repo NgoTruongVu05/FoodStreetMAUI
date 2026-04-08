@@ -7,6 +7,7 @@ using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
+using FoodStreetMAUI.Models;
 using System.Collections.Generic;
 using System.Linq;
 using MapsuiMap = Mapsui.Map;
@@ -139,16 +140,49 @@ namespace FoodStreetMAUI.Views
         private void RefreshMarkerLayer()
         {
             if (_markerLayer == null) return;
-
             var list = new List<IFeature>();
-            var nearestId = _vm.NearestPoiId;
+
+            // Determine nearest triggered POI (active or approaching) relative to last known user location
+            Guid? nearestTriggeredId = null;
+            if (_vm.LastLatitude is double ula && _vm.LastLongitude is double ulo)
+            {
+                var triggered = _vm.Pois
+                    .Where(p => p.Status == PoiStatus.Active || p.Status == PoiStatus.Approaching)
+                    .Select(p => (poi: p, d: (p.Location.Latitude - ula) * (p.Location.Latitude - ula) + (p.Location.Longitude - ulo) * (p.Location.Longitude - ulo)))
+                    .OrderBy(x => x.d)
+                    .ToList();
+
+                if (triggered.Count > 0) nearestTriggeredId = triggered[0].poi.Id;
+            }
+            else if (_vm.NearestPoiId.HasValue)
+            {
+                var cand = _vm.Pois.FirstOrDefault(p => p.Id == _vm.NearestPoiId.Value);
+                if (cand != null && (cand.Status == PoiStatus.Active || cand.Status == PoiStatus.Approaching))
+                    nearestTriggeredId = cand.Id;
+            }
 
             foreach (var poi in _vm.Pois)
             {
-                var isNearest = nearestId.HasValue && poi.Id == nearestId.Value;
                 var (px, py) = SphericalMercator.FromLonLat(poi.Location.Longitude, poi.Location.Latitude);
-                var f = new PointFeature(new MPoint(px, py)) { Styles = { PoiSymbolStyle(isNearest) } };
-                f["PoiId"] = poi.Id; // Đính kèm ID của POI để nhận diện khi click
+
+                // Color logic: red = nearest triggered, yellow = triggered (active/approaching), green = normal
+                MColor fillColor;
+                bool isNearest = nearestTriggeredId.HasValue && poi.Id == nearestTriggeredId.Value;
+                if (isNearest)
+                {
+                    fillColor = MColor.Red;
+                }
+                else if (poi.Status == PoiStatus.Active || poi.Status == PoiStatus.Approaching)
+                {
+                    fillColor = MColor.Yellow;
+                }
+                else
+                {
+                    fillColor = MColor.Green;
+                }
+
+                var f = new PointFeature(new MPoint(px, py)) { Styles = { PoiSymbolStyle(fillColor, isNearest) } };
+                f["PoiId"] = poi.Id; // attach id
                 list.Add(f);
             }
 
@@ -187,7 +221,7 @@ namespace FoodStreetMAUI.Views
             }
         }
 
-        private static IStyle PoiSymbolStyle(bool nearest)
+        private static IStyle PoiSymbolStyle(MColor fillColor, bool nearest)
         {
             return new SymbolStyle
             {
@@ -196,9 +230,7 @@ namespace FoodStreetMAUI.Views
 
                 Fill = new MBrush
                 {
-                    Color = nearest
-                ? MColor.Red     // POI gần nhất
-                : MColor.Green   // POI thường
+                    Color = fillColor
                 },
 
                 Outline = new Pen

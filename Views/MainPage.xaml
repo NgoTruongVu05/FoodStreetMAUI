@@ -72,6 +72,28 @@
             <!-- Mapsui + OpenStreetMap (Mapsui.Tiling) — không cần Google Maps API key -->
             <Grid x:Name="MapHost" BackgroundColor="#111820"/>
 
+            <!-- Legend (bottom-left) -->
+            <Border BackgroundColor="#1A1A26" Padding="8" StrokeShape="RoundRectangle 8" HorizontalOptions="Start" VerticalOptions="End" Margin="12,0,0,12" Opacity="0.95">
+                <VerticalStackLayout Spacing="6">
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <BoxView WidthRequest="14" HeightRequest="14" Color="Blue" CornerRadius="3"/>
+                        <Label Text="Bạn" FontSize="12" TextColor="#D0D0D0"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <BoxView WidthRequest="14" HeightRequest="14" Color="Green" CornerRadius="3"/>
+                        <Label Text="Điểm đến" FontSize="12" TextColor="#D0D0D0"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <BoxView WidthRequest="14" HeightRequest="14" Color="Yellow" CornerRadius="3"/>
+                        <Label Text="Đang cận" FontSize="12" TextColor="#D0D0D0"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <BoxView WidthRequest="14" HeightRequest="14" Color="Red" CornerRadius="3"/>
+                        <Label Text="Gần nhất" FontSize="12" TextColor="#D0D0D0"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Floating top elements -->
             <VerticalStackLayout Spacing="0" VerticalOptions="Start" InputTransparent="True" CascadeInputTransparent="False">
                 <Label Text="{Binding NearestPoiSummary}" FontSize="11" TextColor="#F0A030"

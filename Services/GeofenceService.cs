@@ -17,70 +17,115 @@ namespace FoodStreetMAUI.Services
 
     public class GeofenceService
     {
+        private readonly object _sync = new();
         public event EventHandler<GeofenceEventArgs>? GeofenceTriggered;
         public event EventHandler<string>? LogMessage;
 
         private readonly List<PointOfInterest> _pois = new();
+        private readonly Dictionary<Guid, PoiStatus> _prevPrevStatus = new();
         private readonly Dictionary<Guid, PoiStatus> _prevStatus = new();
         private readonly Dictionary<Guid, DateTime> _lastEnter = new();
         private readonly Dictionary<Guid, DateTime> _lastApproach = new();
 
-        public IReadOnlyList<PointOfInterest> Pois => _pois.AsReadOnly();
+        public IReadOnlyList<PointOfInterest> Pois
+        {
+            get
+            {
+                lock (_sync)
+                    return _pois.ToList().AsReadOnly();
+            }
+        }
 
         public void AddPoi(PointOfInterest poi)
         {
-            _pois.Add(poi);
-            _prevStatus[poi.Id] = PoiStatus.Inactive;
+            lock (_sync)
+            {
+                _pois.Add(poi);
+                _prevStatus[poi.Id] = PoiStatus.Inactive;
+            }
         }
 
         public void ClearAll()
         {
-            _pois.Clear();
-            _prevStatus.Clear();
-            _lastEnter.Clear();
-            _lastApproach.Clear();
+            lock (_sync)
+            {
+                _pois.Clear();
+                _prevPrevStatus.Clear();
+                _prevStatus.Clear();
+                _lastEnter.Clear();
+                _lastApproach.Clear();
+            }
         }
 
         public void UpdateLocation(GpsCoordinate location)
         {
-            foreach (var poi in _pois.Where(p => p.IsEnabled)
-                                     .OrderByDescending(p => p.Priority))
+            var logs = new List<string>();
+            var events = new List<GeofenceEventArgs>();
+
+            lock (_sync)
             {
-                double dist = location.DistanceTo(poi.Location);
-                var newStatus = dist <= poi.TriggerRadius ? PoiStatus.Active
-                              : dist <= poi.ApproachRadius ? PoiStatus.Approaching
-                              : PoiStatus.Inactive;
+                var infos = _pois.Where(p => p.IsEnabled)
+                                 .Select(p =>
+                                 {
+                                     var dist = location.DistanceTo(p.Location);
+                                     var newStatus = dist <= p.TriggerRadius ? PoiStatus.Active
+                                                   : dist <= p.ApproachRadius ? PoiStatus.Approaching
+                                                   : PoiStatus.Inactive;
+                                     var prev = _prevStatus.TryGetValue(p.Id, out var ps) ? ps : PoiStatus.Inactive;
+                                     return (poi: p, dist, newStatus, prev);
+                                 })
+                                 .ToList();
 
-                poi.Status = newStatus;
-                var prev = _prevStatus.TryGetValue(poi.Id, out var ps) ? ps : PoiStatus.Inactive;
+                // Determine triggered POIs (Active or Approaching), choose nearest among them
+                var triggered = infos.Where(i => i.newStatus == PoiStatus.Active || i.newStatus == PoiStatus.Approaching)
+                                     .OrderBy(i => i.newStatus == PoiStatus.Active ? 0 : 1)
+                                     .ThenBy(i => i.dist)
+                                     .ToList();
 
-                if (newStatus == PoiStatus.Active && prev != PoiStatus.Active)
+                var nearest = triggered.FirstOrDefault();
+
+                // Fire event only for the nearest triggered POI (if any) to ensure only its audio plays
+                if (nearest.poi != null)
                 {
-                    if (ShouldFireEnter(poi))
+                    var i = nearest;
+                    if (i.newStatus == PoiStatus.Active && i.prev != PoiStatus.Active)
                     {
-                        poi.RecordTrigger();
-                        _lastEnter[poi.Id] = DateTime.Now;
-                        LogMessage?.Invoke(this, $"✅ ENTER: {poi.Emoji} {poi.Name} ({dist:F0}m)");
-                        GeofenceTriggered?.Invoke(this, new GeofenceEventArgs(poi, "Enter", dist, location));
+                        if (ShouldFireEnter(i.poi))
+                        {
+                            i.poi.RecordTrigger();
+                            _lastEnter[i.poi.Id] = DateTime.Now;
+                            logs.Add($"✅ ENTER: {i.poi.Emoji} {i.poi.Name} ({i.dist:F0}m)");
+                            events.Add(new GeofenceEventArgs(i.poi, "Enter", i.dist, location));
+                        }
+                    }
+                    else if (i.newStatus == PoiStatus.Approaching && i.prev == PoiStatus.Inactive
+                             && i.poi.TriggerMode != TriggerMode.OnEnter)
+                    {
+                        if (ShouldFireApproach(i.poi))
+                        {
+                            _lastApproach[i.poi.Id] = DateTime.Now;
+                            logs.Add($"📍 APPROACH: {i.poi.Emoji} {i.poi.Name} ({i.dist:F0}m)");
+                            events.Add(new GeofenceEventArgs(i.poi, "Approach", i.dist, location));
+                        }
                     }
                 }
-                else if (newStatus == PoiStatus.Approaching && prev == PoiStatus.Inactive
-                         && poi.TriggerMode != TriggerMode.OnEnter)
-                {
-                    if (ShouldFireApproach(poi))
-                    {
-                        _lastApproach[poi.Id] = DateTime.Now;
-                        LogMessage?.Invoke(this, $"📍 APPROACH: {poi.Emoji} {poi.Name} ({dist:F0}m)");
-                        GeofenceTriggered?.Invoke(this, new GeofenceEventArgs(poi, "Approach", dist, location));
-                    }
-                }
-                else if (newStatus == PoiStatus.Inactive && prev != PoiStatus.Inactive)
-                {
-                    LogMessage?.Invoke(this, $"↩️ EXIT: {poi.Name}");
-                }
 
-                _prevStatus[poi.Id] = newStatus;
+                // Update statuses and prev status for all POIs; log exits
+                foreach (var info in infos)
+                {
+                    if (info.newStatus == PoiStatus.Inactive && info.prev != PoiStatus.Inactive)
+                        logs.Add($"↩️ EXIT: {info.poi.Name}");
+
+                    _prevPrevStatus[info.poi.Id] = info.prev;
+                    _prevStatus[info.poi.Id] = info.newStatus;
+                    info.poi.Status = info.newStatus;
+                }
             }
+
+            foreach (var log in logs)
+                LogMessage?.Invoke(this, log);
+            foreach (var evt in events)
+                GeofenceTriggered?.Invoke(this, evt);
         }
 
         private bool ShouldFireEnter(PointOfInterest poi)
@@ -99,10 +144,15 @@ namespace FoodStreetMAUI.Services
         }
 
         public List<(PointOfInterest poi, double dist)> GetNearby(GpsCoordinate loc, double maxDist = 1000)
-            => _pois
-               .Select(p => (p, loc.DistanceTo(p.Location)))
-               .Where(x => x.Item2 <= maxDist)
-               .OrderBy(x => x.Item2)
-               .ToList();
+        {
+            lock (_sync)
+            {
+                return _pois
+                    .Select(p => (p, loc.DistanceTo(p.Location)))
+                    .Where(x => x.Item2 <= maxDist)
+                    .OrderBy(x => x.Item2)
+                    .ToList();
+            }
+        }
     }
 }
