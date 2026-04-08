@@ -10,25 +10,21 @@ public partial class PoiListPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
-
-    private void OnPoiTapped(object sender, TappedEventArgs e)
+    private async void OnPoiTapped(object sender, TappedEventArgs e)
     {
-        // Lấy thẻ Border đã được click
-        if (sender is Border border)
+        // Khi ấn vào một POI, mở modal chi tiết
+        if (sender is BindableObject b && b.BindingContext is Models.PointOfInterest poi)
         {
-            // Lấy Layout thực tế đang bọc Grid và Label
-            if (border.Content is Layout layout)
-            {
-                // Lấy phần tử con cuối cùng trong Layout (chính là Label mô tả)
-                var descriptionLabel = layout.Children.LastOrDefault() as Label;
-
-                if (descriptionLabel != null)
-                {
-                    // Thay đổi trạng thái ẩn/hiện
-                    descriptionLabel.IsVisible = !descriptionLabel.IsVisible;
-                }
-            }
+            await ShowPoiDetailAsync(poi);
         }
+    }
+
+    // Public API để trang khác (MainPage) có thể yêu cầu hiển thị chi tiết của POI
+    public async System.Threading.Tasks.Task ShowPoiDetailAsync(Models.PointOfInterest poi)
+    {
+        var detail = new PoiDetailPage();
+        detail.SetPoi(poi, (BindingContext as MainViewModel)?.CurrentLang ?? "vi");
+        await Navigation.PushModalAsync(detail);
     }
 
     private void OnPlayAudioTapped(object sender, EventArgs e)

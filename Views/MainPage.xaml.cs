@@ -44,6 +44,19 @@ namespace FoodStreetMAUI.Views
             _vm.NearestPoiOrLocationChanged += _onNearestOrPoiChanged;
         }
 
+        private async void OnViewDetailsClicked(object sender, EventArgs e)
+        {
+            if (_vm.SelectedPoi == null) return;
+
+            // Navigate to PoiListPage and ask it to show the detail modal for the selected POI
+            var page = new PoiListPage(_vm);
+            await Navigation.PushAsync(page);
+
+            // Allow page to initialize then show detail
+            await System.Threading.Tasks.Task.Delay(120);
+            await page.ShowPoiDetailAsync(_vm.SelectedPoi);
+        }
+
         private void SetupMap()
         {
             _map = new MapsuiMap();
