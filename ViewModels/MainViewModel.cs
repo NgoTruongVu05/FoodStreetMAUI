@@ -24,7 +24,7 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string coordinateText = "---";
         [ObservableProperty] string accuracyText = "";
         [ObservableProperty] bool isTracking = false;
-        [ObservableProperty] bool isSimulating = false;
+        // simulation feature removed for production
         [ObservableProperty] bool isMuted = false;
         [ObservableProperty] float volume = 0.8f;
         [ObservableProperty] string nowPlayingTitle = "Chờ kích hoạt POI...";
@@ -173,11 +173,11 @@ namespace FoodStreetMAUI.ViewModels
                 {
                     _sessionStart = DateTime.Now;
                     StartSessionTimer();
-                    await _gps.StartTrackingAsync(IsSimulating);
+                    await _gps.StartTrackingAsync();
                     IsTracking = true;
                     StartButtonText = "Tắt GPS";
                     StartButtonColor = "#3a1a1a";
-                    AddLog(IsSimulating ? "Mô phỏng tour Bui Vien..." : "GPS thực đang hoạt động...");
+                    AddLog("GPS thực đang hoạt động...");
                 }
             }
             catch (Exception ex)

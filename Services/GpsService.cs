@@ -20,7 +20,6 @@ namespace FoodStreetMAUI.Services
 
         public GpsCoordinate? CurrentLocation { get; private set; }
         public bool IsTracking { get; private set; }
-        public bool IsSimulating { get; private set; }
         public double TotalDistance { get; private set; }
 
         public int UpdateIntervalMs { get; set; } = 2000;
@@ -28,35 +27,15 @@ namespace FoodStreetMAUI.Services
         private CancellationTokenSource? _cts;
         private GpsCoordinate? _lastLocation;
 
-        // ── Simulation path: Bùi Viện, HCMC ─────────────────────────────────
-        private readonly List<GpsCoordinate> _simPath = new()
-        {
-            new(10.76926, 106.69204), new(10.76910, 106.69220),
-            new(10.76895, 106.69235), new(10.76880, 106.69248),
-            new(10.76865, 106.69262), new(10.76850, 106.69275),
-            new(10.76835, 106.69288), new(10.76818, 106.69302),
-            new(10.76805, 106.69315), new(10.76790, 106.69328),
-        };
-        private int _simIndex;
-        private int _simDir = 1;
+        // (simulation removed in production)
 
         // ── Start / Stop ──────────────────────────────────────────────────────
-        public async Task StartTrackingAsync(bool simulate = false)
+        public async Task StartTrackingAsync()
         {
             if (IsTracking) return;
             IsTracking = true;
-            IsSimulating = simulate;
             _cts = new CancellationTokenSource();
-
-            if (simulate)
-            {
-                _ = SimulationLoopAsync(_cts.Token);
-                StatusChanged?.Invoke(this, "🎮 Mô phỏng GPS");
-            }
-            else
-            {
-                await StartRealGpsAsync(_cts.Token);
-            }
+            await StartRealGpsAsync(_cts.Token);
         }
 
         public void StopTracking()
@@ -64,10 +43,7 @@ namespace FoodStreetMAUI.Services
             _cts?.Cancel();
             IsTracking = false;
 
-            if (!IsSimulating)
-            {
-                try { Geolocation.StopListeningForeground(); } catch { }
-            }
+            try { Geolocation.StopListeningForeground(); } catch { }
 
             StatusChanged?.Invoke(this, "⏹ GPS đã dừng");
         }
@@ -153,33 +129,7 @@ namespace FoodStreetMAUI.Services
             PushLocation(loc);
         }
 
-        // ── Simulation ────────────────────────────────────────────────────────
-        private async Task SimulationLoopAsync(CancellationToken ct)
-        {
-            while (!ct.IsCancellationRequested)
-            {
-                try
-                {
-                    var pt = _simPath[_simIndex];
-                    var rng = Random.Shared;
-                    var jitter = 0.000006;
-                    var loc = new GpsCoordinate(
-                        pt.Latitude + (rng.NextDouble() - 0.5) * jitter,
-                        pt.Longitude + (rng.NextDouble() - 0.5) * jitter,
-                        3.0 + rng.NextDouble() * 3);
-
-                    PushLocation(loc);
-
-                    _simIndex += _simDir;
-                    if (_simIndex >= _simPath.Count) { _simDir = -1; _simIndex = _simPath.Count - 2; }
-                    if (_simIndex < 0) { _simDir = 1; _simIndex = 1; }
-
-                    await Task.Delay(UpdateIntervalMs, ct);
-                }
-                catch (TaskCanceledException) { break; }
-                catch { /* swallow */ }
-            }
-        }
+        // simulation removed
 
         private void PushLocation(GpsCoordinate loc)
         {
