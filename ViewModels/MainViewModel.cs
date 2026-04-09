@@ -289,7 +289,9 @@ namespace FoodStreetMAUI.ViewModels
                         if (newNearestId.HasValue && nearby.Count > 0)
                         {
                             var p = nearby[0].poi;
-                            NearestPoiSummary = p.DisplayName + " · " + (int)newNearestDist + " m";
+                            NearestPoiSummary = newNearestDist < 1000
+                                ? $"{p.DisplayName} · {(int)newNearestDist} m"
+                                : $"{p.DisplayName} · {(newNearestDist / 1000).ToString("F2")} km";
                             ShowNearestPoiBanner = true;
                         }
                         else

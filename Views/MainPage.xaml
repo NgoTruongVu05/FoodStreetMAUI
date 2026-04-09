@@ -96,7 +96,7 @@
 
             <!-- Floating top elements -->
             <VerticalStackLayout Spacing="0" VerticalOptions="Start" InputTransparent="True" CascadeInputTransparent="False">
-                <Label Text="{Binding NearestPoiSummary}" FontSize="11" TextColor="#F0A030"
+                <Label Text="{Binding NearestPoiSummary}" FontSize="11" TextColor="Red" FontAttributes="Bold"
                        Margin="14,6,14,0" LineBreakMode="TailTruncation"
                        IsVisible="{Binding ShowNearestPoiBanner}"
                        InputTransparent="False"/>

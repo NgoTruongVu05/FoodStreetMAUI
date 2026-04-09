@@ -28,6 +28,11 @@ namespace FoodStreetMAUI.Services
             {
                 await _db.ExecuteAsync($"ALTER TABLE {nameof(PoiEntity)} ADD COLUMN {nameof(PoiEntity.ImageUrl)} TEXT");
             }
+
+            if (!columns.Any(c => string.Equals(c.Name, nameof(PoiEntity.MapLink), StringComparison.OrdinalIgnoreCase)))
+            {
+                await _db.ExecuteAsync($"ALTER TABLE {nameof(PoiEntity)} ADD COLUMN {nameof(PoiEntity.MapLink)} TEXT");
+            }
         }
 
         public async Task<List<PointOfInterest>> LoadPoisAsync()
@@ -57,6 +62,7 @@ namespace FoodStreetMAUI.Services
                             Name = entity.Name ?? "",
                             Category = entity.Category ?? "",
                             ImageUrl = entity.ImageUrl ?? "",
+                            MapLink = entity.MapLink,
                             Location = new GpsCoordinate(entity.Lat, entity.Lng),
                             TriggerRadius = 25,
                             ApproachRadius = 70,
@@ -119,6 +125,7 @@ namespace FoodStreetMAUI.Services
                         Description = desc,
                         Category = p.Category,
                         ImageUrl = p.ImageUrl,
+                        MapLink = p.MapLink,
                         Lat = p.Location.Latitude,
                         Lng = p.Location.Longitude
                     });
@@ -152,6 +159,7 @@ namespace FoodStreetMAUI.Services
                             Description = dto.Description,
                             Category = string.Empty,
                             ImageUrl = dto.ImageUrl,
+                            MapLink = dto.MapLink,
                             Lat = dto.Lat,
                             Lng = dto.Lng
                         });
@@ -197,6 +205,7 @@ namespace FoodStreetMAUI.Services
             public string Description { get; set; }
             public string Category { get; set; }
             public string ImageUrl { get; set; }
+            public string MapLink { get; set; }
             public double Lat { get; set; }
             public double Lng { get; set; }
         }

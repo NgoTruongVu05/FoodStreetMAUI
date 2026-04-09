@@ -51,6 +51,7 @@ namespace FoodStreetMAUI.Models
         public string Name { get; set; } = "";
         public string Category { get; set; } = "Ẩm thực";
         public string ImageUrl { get; set; } = "";
+        public string? MapLink { get; set; }
         public string Emoji { get; set; } = "🍜";
         public GpsCoordinate Location { get; set; } = new(0, 0);
         public double TriggerRadius { get; set; } = 25;

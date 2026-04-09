@@ -52,6 +52,9 @@ namespace FoodStreetMAUI.Services
         [JsonPropertyName("image")]
         public string ImageUrl { get; set; }
 
+        [JsonPropertyName("maplink")]
+        public string MapLink { get; set; }
+
         [JsonPropertyName("lat")]
         public double Lat { get; set; }
 

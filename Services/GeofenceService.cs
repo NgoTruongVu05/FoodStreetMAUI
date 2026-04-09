@@ -68,18 +68,19 @@ namespace FoodStreetMAUI.Services
                                  .Select(p =>
                                  {
                                      var dist = location.DistanceTo(p.Location);
-                                     var newStatus = dist <= p.TriggerRadius ? PoiStatus.Active
-                                                   : dist <= p.ApproachRadius ? PoiStatus.Approaching
+                                     var expandedDist = dist + Math.Max(0, location.Accuracy);
+                                     var newStatus = expandedDist <= p.TriggerRadius ? PoiStatus.Active
+                                                   : expandedDist <= p.ApproachRadius ? PoiStatus.Approaching
                                                    : PoiStatus.Inactive;
                                      var prev = _prevStatus.TryGetValue(p.Id, out var ps) ? ps : PoiStatus.Inactive;
-                                     return (poi: p, dist, newStatus, prev);
+                                     return (poi: p, dist, expandedDist, newStatus, prev);
                                  })
                                  .ToList();
 
                 // Determine triggered POIs (Active or Approaching), choose nearest among them
                 var triggered = infos.Where(i => i.newStatus == PoiStatus.Active || i.newStatus == PoiStatus.Approaching)
                                      .OrderBy(i => i.newStatus == PoiStatus.Active ? 0 : 1)
-                                     .ThenBy(i => i.dist)
+                                     .ThenBy(i => i.expandedDist)
                                      .ToList();
 
                 var nearest = triggered.FirstOrDefault();

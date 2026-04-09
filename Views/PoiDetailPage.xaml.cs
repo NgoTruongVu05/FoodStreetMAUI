@@ -3,6 +3,7 @@ using FoodStreetMAUI.ViewModels;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.ApplicationModel;
 using System;
+using System.Globalization;
 
 namespace FoodStreetMAUI.Views
 {
@@ -38,9 +39,11 @@ namespace FoodStreetMAUI.Views
         private async void OnOpenMapsClicked(object sender, EventArgs e)
         {
             if (_poi == null) return;
-            var lat = _poi.Location.Latitude;
-            var lng = _poi.Location.Longitude;
-            var url = $"https://www.google.com/maps?q={lat},{lng}";
+
+            var url = !string.IsNullOrWhiteSpace(_poi.MapLink)
+                ? _poi.MapLink!
+                : $"https://www.google.com/maps?q={_poi.Location.Latitude.ToString(CultureInfo.InvariantCulture)},{_poi.Location.Longitude.ToString(CultureInfo.InvariantCulture)}";
+
             try
             {
                 await Launcher.OpenAsync(url);
