@@ -142,32 +142,30 @@ namespace FoodStreetMAUI.Views
             if (_markerLayer == null) return;
             var list = new List<IFeature>();
 
-            // Determine nearest triggered POI (active or approaching) relative to last known user location
-            Guid? nearestTriggeredId = null;
+            // Determine nearest POI relative to last known user location (independent of trigger status)
+            Guid? nearestPoiId = null;
             if (_vm.LastLatitude is double ula && _vm.LastLongitude is double ulo)
             {
-                var triggered = _vm.Pois
-                    .Where(p => p.Status == PoiStatus.Active || p.Status == PoiStatus.Approaching)
+                var nearest = _vm.Pois
                     .Select(p => (poi: p, d: (p.Location.Latitude - ula) * (p.Location.Latitude - ula) + (p.Location.Longitude - ulo) * (p.Location.Longitude - ulo)))
                     .OrderBy(x => x.d)
-                    .ToList();
+                    .FirstOrDefault();
 
-                if (triggered.Count > 0) nearestTriggeredId = triggered[0].poi.Id;
+                if (nearest.poi != null)
+                    nearestPoiId = nearest.poi.Id;
             }
             else if (_vm.NearestPoiId.HasValue)
             {
-                var cand = _vm.Pois.FirstOrDefault(p => p.Id == _vm.NearestPoiId.Value);
-                if (cand != null && (cand.Status == PoiStatus.Active || cand.Status == PoiStatus.Approaching))
-                    nearestTriggeredId = cand.Id;
+                nearestPoiId = _vm.NearestPoiId.Value;
             }
 
             foreach (var poi in _vm.Pois)
             {
                 var (px, py) = SphericalMercator.FromLonLat(poi.Location.Longitude, poi.Location.Latitude);
 
-                // Color logic: red = nearest triggered, yellow = triggered (active/approaching), green = normal
+                // Color logic: red = nearest to GPS, yellow = approaching/active, green = normal
                 MColor fillColor;
-                bool isNearest = nearestTriggeredId.HasValue && poi.Id == nearestTriggeredId.Value;
+                bool isNearest = nearestPoiId.HasValue && poi.Id == nearestPoiId.Value;
                 if (isNearest)
                 {
                     fillColor = MColor.Red;

@@ -85,7 +85,7 @@
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                         <BoxView WidthRequest="14" HeightRequest="14" Color="Yellow" CornerRadius="3"/>
-                        <Label Text="Đang cận" FontSize="12" TextColor="#D0D0D0"/>
+                        <Label Text="Gần đến" FontSize="12" TextColor="#D0D0D0"/>
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                         <BoxView WidthRequest="14" HeightRequest="14" Color="Red" CornerRadius="3"/>
@@ -181,23 +181,13 @@
 
         <!-- Bottom action bar -->
         <Border Grid.Row="5" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,10">
-            <Grid ColumnDefinitions="*,90" ColumnSpacing="10">
+            <Grid ColumnDefinitions="*" ColumnSpacing="10">
                 <Button Grid.Column="0"
                         Text="{Binding StartButtonText}"
                         BackgroundColor="{Binding StartButtonColor}"
                         TextColor="White" FontSize="13"
                         CornerRadius="10" HeightRequest="44"
                         Command="{Binding ToggleGpsCommand}"/>
-                <Border Grid.Column="1" BackgroundColor="#1E1E2E"
-                        Stroke="#2A2A3A" StrokeThickness="0.5"
-                        StrokeShape="RoundRectangle 10" Padding="8,4">
-                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                        <Label Text="🎮 Mô phỏng" FontSize="9" TextColor="#888888" HorizontalOptions="Center"/>
-                        <Switch IsToggled="{Binding IsSimulating}"
-                                OnColor="#F0A030" ThumbColor="White"
-                                HorizontalOptions="Center" Scale="0.8"/>
-                    </VerticalStackLayout>
-                </Border>
             </Grid>
         </Border>
 
