@@ -83,6 +83,8 @@ namespace FoodStreetMAUI.Views
 
         private async void OnOpenPoiListClicked(object sender, EventArgs e)
         {
+            //Flow: Tạo trang POIList
+            //Navigation.PushAsync mở trang POIList
             await Navigation.PushAsync(new PoiListPage(_vm));
         }
 
@@ -113,6 +115,7 @@ namespace FoodStreetMAUI.Views
 
         private void OnLanguagePickerChanged(object sender, EventArgs e)
         {
+            //Flow: Kiểm tra ngôn ngữ hiện tại
             if (sender is not Picker picker || picker.SelectedItem is not LanguageItem language)
             {
                 return;
@@ -284,6 +287,7 @@ namespace FoodStreetMAUI.Views
 
         private void OnMapTapped(object? sender, TappedEventArgs e)
         {
+            //Flow: Chuyển thành tọa độ trên Map
             var position = e.GetPosition(_mapControl);
             if (position == null)
             {
@@ -395,6 +399,7 @@ namespace FoodStreetMAUI.Views
         private bool TryGetPoiByWorldPosition(MPoint worldPosition, out Models.PointOfInterest poi)
         {
             var resolution = _map?.Navigator != null ? _map.Navigator.Viewport.Resolution : 0;
+            //Với một khoảng cách sai lệch cho phép (50 pixel)
             var tolerance = resolution > 0 ? resolution * 20 : 50;
 
             Models.PointOfInterest? nearestPoi = null;

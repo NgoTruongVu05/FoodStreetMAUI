@@ -73,6 +73,7 @@ namespace FoodStreetMAUI.ViewModels
 
             _gps.LocationUpdated += OnLocationUpdated;
             _gps.StatusChanged += OnGpsStatusChanged;
+            //Alt: Kiểm tra trong bán kính POI
             _geo.GeofenceTriggered += OnGeofenceTriggered;
             _geo.LogMessage += (s, m) => AddLog(m);
             _audio.StatusChanged += (s, m) =>
@@ -260,6 +261,7 @@ namespace FoodStreetMAUI.ViewModels
             catch (Exception ex) { AddLog("Loi geofence update: " + ex.Message); }
 
             var loc = e.Location;
+            // Tìm POI gần nhất để hiển thị banner (nếu có)
             var nearby = _geo.GetNearby(loc, maxDist: 1_000_000);
             Guid? newNearestId = null;
             double newNearestDist = 0;
@@ -314,7 +316,7 @@ namespace FoodStreetMAUI.ViewModels
                 GpsStatusText = msg;
                 AddLog(msg);
             });
-
+        // Xác định trigger và độ ưu tiên
         private void OnGeofenceTriggered(object? sender, GeofenceEventArgs e)
             => MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -324,10 +326,11 @@ namespace FoodStreetMAUI.ViewModels
                     if (content == null) return;
 
                     AddLog((e.EventType == "Enter" || e.EventType == "EnterFollow" ? "DA DEN: " : "GAN DEN: ") + e.Poi.Name + " (" + (int)e.Distance + "m)");
-
-                    // For the first Enter we want to immediately update UI and play with priority.
+                    // Xác định nội dung nào sẽ được phát dựa trên loại sự kiện và ưu tiên (Enter > Approach)
                     if (e.EventType == "Enter")
                     {
+                        //Flow: Phát nội dung
+                        //Flow: Hiển thị trạng thái phát của POI
                         SelectedPoi = e.Poi;
                         NowPlayingTitle = e.Poi.Emoji + " " + content.Title;
                         NowPlayingDesc = content.Description;
@@ -343,6 +346,7 @@ namespace FoodStreetMAUI.ViewModels
                     else if (e.EventType == "Approach")
                     {
                         // Queue approach audio; when it starts, update the NowPlaying UI to reflect this poi
+                        
                         _audio.Volume = Volume;
                         _audio.PlayContent(
                             content,
@@ -379,6 +383,7 @@ namespace FoodStreetMAUI.ViewModels
 
         public void PlayPoiAudio(PointOfInterest poi)
         {
+            //Flow: Xác định ngôn ngữ và bản dịch
             SelectedPoi = poi;
 
             var content = poi.GetContent(CurrentLang);
@@ -390,6 +395,7 @@ namespace FoodStreetMAUI.ViewModels
 
             _audio.Volume = Volume;
             _audio.PlayContent(content, priority: true, tag: poi.Id.ToString());
+            //Vì có sự ưu tiên (priority: true) nên sẽ phát ngay lập tức.
         }
 
         private void StartSessionTimer()
@@ -428,6 +434,7 @@ namespace FoodStreetMAUI.ViewModels
 
         partial void OnSelectedLanguageChanged(LanguageItem value)
         {
+            //Flow: Kiểm tra ngôn ngữ hiện tại
             if (value != null)
             {
                 CurrentLang = string.IsNullOrWhiteSpace(value.Code) ? "vi" : value.Code;

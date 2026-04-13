@@ -22,6 +22,7 @@ public partial class PoiListPage : ContentPage
     // Public API để trang khác (MainPage) có thể yêu cầu hiển thị chi tiết của POI
     public async System.Threading.Tasks.Task ShowPoiDetailAsync(Models.PointOfInterest poi)
     {
+        //Gán nội dung POI vào POIDetail và Set biến isPoiModalVisible = true để hiển thị modal
         var detail = new PoiDetailPage();
         detail.SetPoi(poi, (BindingContext as MainViewModel)?.CurrentLang ?? "vi");
         await Navigation.PushModalAsync(detail);
@@ -29,8 +30,7 @@ public partial class PoiListPage : ContentPage
 
     private void OnPlayAudioTapped(object sender, EventArgs e)
     {
-        // Ngăn chặn sự kiện click lan ra Border cha (OnPoiTapped)
-        // Lấy thông tin PointOfInterest được click
+        // Lấy thông tin Poi được click
         if (sender is BindableObject bindable
             && bindable.BindingContext is Models.PointOfInterest poi
             && BindingContext is MainViewModel vm)

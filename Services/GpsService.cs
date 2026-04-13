@@ -65,10 +65,10 @@ namespace FoodStreetMAUI.Services
                     IsTracking = false;
                     return;
                 }
-
+                //Flow: Di chuyển (thay đổi vị trí)
                 Geolocation.LocationChanged -= OnLocationChanged;
                 Geolocation.LocationChanged += OnLocationChanged;
-
+                //Mỗi khi có vị trí mới từ GPS. sự kiện này sẽ gọi hàm OnLocationChanged để cập nhật vị trí hiện tại.
                 var req = new GeolocationListeningRequest(
                     GeolocationAccuracy.Best,
                     TimeSpan.FromMilliseconds(UpdateIntervalMs));
@@ -126,6 +126,7 @@ namespace FoodStreetMAUI.Services
                 e.Location.Latitude,
                 e.Location.Longitude,
                 e.Location.Accuracy ?? 10);
+            //Flow: Gửi tọa độ
             PushLocation(loc);
         }
 
