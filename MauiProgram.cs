@@ -21,6 +21,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeofenceService>();
         builder.Services.AddSingleton<AudioService>();
         builder.Services.AddSingleton<DataService>();
+        builder.Services.AddSingleton<HeartbeatService>();
 
         // ViewModel + View
         builder.Services.AddSingleton<MainViewModel>();
