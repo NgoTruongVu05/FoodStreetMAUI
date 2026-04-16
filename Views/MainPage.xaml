@@ -25,32 +25,15 @@
         <Border Grid.Row="1" BackgroundColor="#13131C" Padding="10,6">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" VerticalOptions="Center">
                 <Label Text="Ngôn ngữ:" FontSize="11" TextColor="#888888" VerticalOptions="Center"/>
-                <Grid Grid.Column="1">
-
-                    <Border StrokeThickness="0"
-                            StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#1E1E2E"
-                            Padding="10,4">
-
-                        <Grid ColumnDefinitions="*,Auto">
-
-                            <!-- Picker -->
-                            <Picker ItemsSource="{Binding Languages}"
-                                    ItemDisplayBinding="{Binding Label}"
-                                    SelectedItem="{Binding SelectedLanguage}"
-                                    TextColor="White"
-                                    FontSize="12"
-                                    SelectedIndexChanged="OnLanguagePickerChanged"/>
-
-                            <!-- Icon dropdown -->
-                            <Label Grid.Column="1"
-                                   Text="▼"
-                                   FontSize="12"
-                                   TextColor="#888888"
-                                   VerticalOptions="Center"
-                                   Margin="0,0,4,0"/>
-                        </Grid>
-                    </Border>
+                <Grid Grid.Column="1" HorizontalOptions="End">
+                    <ImageButton Source="icon_translate.svg"
+                         WidthRequest="40"
+                         HeightRequest="40"
+                         BackgroundColor="#F0A030"
+                         CornerRadius="20"
+                         Command="{Binding ShowLanguageModalCommand}"
+                         Padding="8"
+                         Aspect="AspectFit"/>
                 </Grid>
             </Grid>
         </Border>
@@ -277,6 +260,87 @@
                     <Button Text="Đóng" 
                             Command="{Binding CloseNowPlayingModalCommand}" 
                             BackgroundColor="#2A2A3A" 
+                            TextColor="#CCCCCC"
+                            FontSize="14" FontAttributes="Bold"
+                            CornerRadius="20" HeightRequest="44"
+                            Margin="0,15,0,0"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Modal chọn ngôn ngữ -->
+        <Grid Grid.Row="0" Grid.RowSpan="6"
+              BackgroundColor="#B3000000"
+              IsVisible="{Binding IsLanguageModalVisible}">
+            <!-- Click background to close -->
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseLanguageModalCommand}" />
+            </Grid.GestureRecognizers>
+
+            <Border BackgroundColor="#1E1E2E"
+                    VerticalOptions="End"
+                    Margin="0"
+                    Padding="20,15,20,30"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 24,24,0,0">
+                <!-- Prevent closing when clicking inside the sheet -->
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding DummyCommand}" />
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="18">
+                    <!-- Handle UI indicator -->
+                    <BoxView HeightRequest="4" WidthRequest="40" Color="#4A4A5A" CornerRadius="2" HorizontalOptions="Center"/>
+
+                    <Label Text="Cài đặt ngôn ngữ" FontSize="18" FontAttributes="Bold" TextColor="#F0A030" HorizontalOptions="Center" Margin="0,10,0,0"/>
+
+                    <!-- Picker ngôn ngữ thuyết minh (giữ nguyên UI và logic) -->
+                    <Border StrokeThickness="0"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#1E1E2E"
+                            Padding="10,4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <!-- Picker -->
+                            <Picker ItemsSource="{Binding Languages}"
+                                    ItemDisplayBinding="{Binding Label}"
+                                    SelectedItem="{Binding SelectedLanguage}"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    SelectedIndexChanged="OnLanguagePickerChanged"/>
+
+                            <!-- Icon dropdown -->
+                            <Label Grid.Column="1"
+                                   Text="▼"
+                                   FontSize="12"
+                                   TextColor="#888888"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,4,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Picker ngôn ngữ hệ thống -->
+                    <Border StrokeThickness="0"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#1E1E2E"
+                            Padding="10,4" Margin="0,10,0,0">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Picker ItemsSource="{Binding Languages}"
+                                    ItemDisplayBinding="{Binding Label}"
+                                    SelectedItem="{Binding SelectedSystemLanguage}"
+                                    TextColor="White"
+                                    FontSize="12"/>
+                            <Label Grid.Column="1"
+                                   Text="▼"
+                                   FontSize="12"
+                                   TextColor="#888888"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,4,0"/>
+                        </Grid>
+                    </Border>
+
+                    <Button Text="Đóng"
+                            Command="{Binding CloseLanguageModalCommand}"
+                            BackgroundColor="#2A2A3A"
                             TextColor="#CCCCCC"
                             FontSize="14" FontAttributes="Bold"
                             CornerRadius="20" HeightRequest="44"

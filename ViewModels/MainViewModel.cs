@@ -53,6 +53,8 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] string nearestPoiSummary = "";
         [ObservableProperty] bool showNearestPoiBanner;
 
+        [ObservableProperty] bool isLanguageModalVisible = false;
+
         public ObservableCollection<PointOfInterest> Pois { get; } = new();
         public ObservableCollection<string> LogLines { get; } = new();
         public ObservableCollection<LanguageItem> Languages { get; } = new();
@@ -452,6 +454,18 @@ namespace FoodStreetMAUI.ViewModels
             SelectedPoi = null;
             IsNowPlayingModalVisible = false;
             IsPoiModalVisible = false;
+        }
+
+        [RelayCommand]
+        void ShowLanguageModal()
+        {
+            IsLanguageModalVisible = true;
+        }
+
+        [RelayCommand]
+        void CloseLanguageModal()
+        {
+            IsLanguageModalVisible = false;
         }
     }
 
