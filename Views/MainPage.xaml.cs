@@ -43,6 +43,112 @@ namespace FoodStreetMAUI.Views
             SetupMap();
 
             _vm.NearestPoiOrLocationChanged += _onNearestOrPoiChanged;
+
+            FoodStreetMAUI.Services.DeepLinkDispatcher.UriReceived += OnDeepLinkUriReceived;
+        }
+
+        private void OnDeepLinkUriReceived(object? sender, System.Uri uri)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+                    await HandleDeepLinkAsync(uri);
+                }
+                catch
+                {
+                }
+            });
+        }
+
+        private async System.Threading.Tasks.Task HandleDeepLinkAsync(System.Uri uri)
+        {
+            if (!string.Equals(uri.Scheme, "poiapp", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var host = uri.Host ?? string.Empty;
+            if (!string.Equals(host, "poi-detail", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var query = ParseQuery(uri.Query);
+            query.TryGetValue("id", out var id);
+            query.TryGetValue("audio", out var audio);
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return;
+            }
+
+            var poi = _vm.Pois.FirstOrDefault(p =>
+                (!string.IsNullOrWhiteSpace(p.ExternalId)
+                    && string.Equals(p.ExternalId, id, System.StringComparison.OrdinalIgnoreCase))
+                || string.Equals(p.Id.ToString(), id, System.StringComparison.OrdinalIgnoreCase)
+                || string.Equals(p.Name, id, System.StringComparison.OrdinalIgnoreCase));
+
+            if (poi == null)
+            {
+                return;
+            }
+
+            var page = new PoiListPage(_vm);
+            await Navigation.PushAsync(page);
+            await System.Threading.Tasks.Task.Delay(120);
+            await page.ShowPoiDetailAsync(poi);
+
+            if (string.Equals(audio, "1", System.StringComparison.OrdinalIgnoreCase)
+                || string.Equals(audio, "true", System.StringComparison.OrdinalIgnoreCase))
+            {
+                _vm.PlayPoiAudio(poi);
+            }
+        }
+
+        private static Dictionary<string, string> ParseQuery(string? query)
+        {
+            var dict = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return dict;
+            }
+
+            var q = query;
+            if (q.StartsWith("?", System.StringComparison.Ordinal))
+            {
+                q = q[1..];
+            }
+
+            foreach (var part in q.Split('&', System.StringSplitOptions.RemoveEmptyEntries))
+            {
+                var idx = part.IndexOf('=');
+                string key;
+                string value;
+
+                if (idx < 0)
+                {
+                    key = part;
+                    value = string.Empty;
+                }
+                else
+                {
+                    key = part[..idx];
+                    value = part[(idx + 1)..];
+                }
+
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    continue;
+                }
+
+                key = System.Uri.UnescapeDataString(key.Replace('+', ' '));
+                value = System.Uri.UnescapeDataString(value.Replace('+', ' '));
+                dict[key] = value;
+            }
+
+            return dict;
         }
 
         private async void OnViewDetailsClicked(object sender, EventArgs e)
@@ -56,6 +162,11 @@ namespace FoodStreetMAUI.Views
             // Allow page to initialize then show detail
             await System.Threading.Tasks.Task.Delay(120);
             await page.ShowPoiDetailAsync(_vm.SelectedPoi);
+        }
+
+        private async void OnScanQrClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new QrScanPage());
         }
 
         private void SetupMap()
@@ -445,6 +556,7 @@ namespace FoodStreetMAUI.Views
         public void Dispose()
         {
             _vm.NearestPoiOrLocationChanged -= _onNearestOrPoiChanged;
+            FoodStreetMAUI.Services.DeepLinkDispatcher.UriReceived -= OnDeepLinkUriReceived;
             if (_mapControl != null)
             {
                 _mapControl.Info -= OnMapInfo;

@@ -48,6 +48,7 @@ namespace FoodStreetMAUI.Models
     public class PointOfInterest
     {
         public Guid Id { get; set; } = Guid.NewGuid();
+        public string? ExternalId { get; set; }
         public string Name { get; set; } = "";
         public string Category { get; set; } = "Ẩm thực";
         public string ImageUrl { get; set; } = "";

@@ -31,14 +31,21 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="ZXing.Net.Maui.Controls" Version="0.7.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <MauiXaml Update="Views\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
     <MauiXaml Update="Views\PoiDetailPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="Views\PoiListPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
+  </ItemGroup>
+  <ItemGroup>
+	  <PackageReference Update="Xamarin.AndroidX.Tracing.Tracing.Ktx" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

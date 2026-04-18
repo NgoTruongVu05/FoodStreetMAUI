@@ -164,13 +164,23 @@
 
         <!-- Bottom action bar -->
         <Border Grid.Row="5" BackgroundColor="#13131C" StrokeThickness="0" Padding="12,10">
-            <Grid ColumnDefinitions="*" ColumnSpacing="10">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                 <Button Grid.Column="0"
                         Text="{Binding StartButtonText}"
                         BackgroundColor="{Binding StartButtonColor}"
                         TextColor="White" FontSize="13"
                         CornerRadius="10" HeightRequest="44"
                         Command="{Binding ToggleGpsCommand}"/>
+
+                <ImageButton Grid.Column="1"
+                             Source="icon_qr.svg"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             BackgroundColor="#F0A030"
+                             CornerRadius="22"
+                             Padding="10"
+                             Aspect="AspectFit"
+                             Clicked="OnScanQrClicked" />
             </Grid>
         </Border>
 

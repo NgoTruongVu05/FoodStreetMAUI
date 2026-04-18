@@ -59,6 +59,7 @@ namespace FoodStreetMAUI.Services
                         var poi = new PointOfInterest
                         {
                             Id = Guid.TryParse(entity.Id, out var guid) ? guid : Guid.NewGuid(),
+                            ExternalId = entity.Id,
                             Name = entity.Name ?? "",
                             Category = entity.Category ?? "",
                             ImageUrl = entity.ImageUrl ?? "",
