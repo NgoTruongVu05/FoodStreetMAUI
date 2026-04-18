@@ -78,9 +78,11 @@ namespace FoodStreetMAUI.Services
                                  .ToList();
 
                 // Determine triggered POIs (Active or Approaching), choose nearest among them
+                // If distance is equal, POI with higher priority wins.
                 var triggered = infos.Where(i => i.newStatus == PoiStatus.Active || i.newStatus == PoiStatus.Approaching)
                                      .OrderBy(i => i.newStatus == PoiStatus.Active ? 0 : 1)
                                      .ThenBy(i => i.expandedDist)
+                                     .ThenByDescending(i => i.poi.Priority)
                                      .ToList();
 
                 var nearest = triggered.FirstOrDefault();

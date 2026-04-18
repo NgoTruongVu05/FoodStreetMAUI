@@ -57,7 +57,7 @@ namespace FoodStreetMAUI.Models
         public GpsCoordinate Location { get; set; } = new(0, 0);
         public double TriggerRadius { get; set; } = 25;
         public double ApproachRadius { get; set; } = 55;
-        public int Priority { get; set; } = 5;
+        public int Priority { get; set; }
         public TriggerMode TriggerMode { get; set; } = TriggerMode.Both;
         public bool IsEnabled { get; set; } = true;
         public PoiStatus Status { get; set; } = PoiStatus.Inactive;

@@ -33,6 +33,11 @@ namespace FoodStreetMAUI.Services
             {
                 await _db.ExecuteAsync($"ALTER TABLE {nameof(PoiEntity)} ADD COLUMN {nameof(PoiEntity.MapLink)} TEXT");
             }
+
+            if (!columns.Any(c => string.Equals(c.Name, nameof(PoiEntity.Priority), StringComparison.OrdinalIgnoreCase)))
+            {
+                await _db.ExecuteAsync($"ALTER TABLE {nameof(PoiEntity)} ADD COLUMN {nameof(PoiEntity.Priority)} INTEGER NOT NULL DEFAULT 0");
+            }
         }
 
         public async Task<List<PointOfInterest>> LoadPoisAsync()
@@ -67,7 +72,7 @@ namespace FoodStreetMAUI.Services
                             Location = new GpsCoordinate(entity.Lat, entity.Lng),
                             TriggerRadius = 25,
                             ApproachRadius = 70,
-                            Priority = 8,
+                            Priority = entity.Priority,
                             DebounceSeconds = 150
                         };
 
@@ -119,16 +124,17 @@ namespace FoodStreetMAUI.Services
                 foreach (var p in pois)
                 {
                     var desc = p.GetContent("vi")?.Description ?? "";
-                    entities.Add(new PoiEntity 
-                    { 
-                        Id = p.Id.ToString(), 
+                    entities.Add(new PoiEntity
+                    {
+                        Id = p.Id.ToString(),
                         Name = p.Name,
                         Description = desc,
                         Category = p.Category,
                         ImageUrl = p.ImageUrl,
                         MapLink = p.MapLink,
                         Lat = p.Location.Latitude,
-                        Lng = p.Location.Longitude
+                        Lng = p.Location.Longitude,
+                        Priority = p.Priority
                     });
                 }
                 await _db.InsertAllAsync(entities);
@@ -153,16 +159,17 @@ namespace FoodStreetMAUI.Services
                     var entities = new List<PoiEntity>();
                     foreach (var dto in apiPois)
                     {
-                        entities.Add(new PoiEntity 
-                        { 
-                            Id = dto.Id ?? Guid.NewGuid().ToString(), 
+                        entities.Add(new PoiEntity
+                        {
+                            Id = dto.Id ?? Guid.NewGuid().ToString(),
                             Name = dto.Name,
                             Description = dto.Description,
                             Category = string.Empty,
                             ImageUrl = dto.ImageUrl,
                             MapLink = dto.MapLink,
                             Lat = dto.Lat,
-                            Lng = dto.Lng
+                            Lng = dto.Lng,
+                            Priority = dto.Priority
                         });
                     }
                     await _db.InsertAllAsync(entities);
@@ -209,6 +216,7 @@ namespace FoodStreetMAUI.Services
             public string MapLink { get; set; }
             public double Lat { get; set; }
             public double Lng { get; set; }
+            public int Priority { get; set; }
         }
 
         [SQLite.Table("poitranslations")]

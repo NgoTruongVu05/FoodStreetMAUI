@@ -60,6 +60,10 @@ namespace FoodStreetMAUI.Services
 
         [JsonPropertyName("lng")]
         public double Lng { get; set; }
+
+        [JsonPropertyName("priority")]
+        [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+        public int Priority { get; set; }
     }
 
     public class PoiTranslationDto
