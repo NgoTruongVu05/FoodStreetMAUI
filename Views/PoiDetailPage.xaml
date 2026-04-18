@@ -6,13 +6,13 @@
              BackgroundColor="#0F0F16">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20">
-        <Label Text="Chi tiết điểm" FontSize="16" FontAttributes="Bold" TextColor="#F0A030" HorizontalOptions="Center" />
+        <Label Text="{Binding UiTexts.PoiDetailTitle}" FontSize="16" FontAttributes="Bold" TextColor="#F0A030" HorizontalOptions="Center" />
 
         <!-- Image or placeholder -->
         <Border Grid.Row="1" Margin="0,12,0,0" BackgroundColor="#1A1A26" StrokeShape="RoundRectangle 12" HeightRequest="180">
             <Grid>
                 <Image x:Name="PoiImage" Aspect="AspectFill" IsVisible="False"/>
-                <Label x:Name="NoImageLabel" Text="Chưa có ảnh" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#AAAAAA" FontSize="14" IsVisible="False"/>
+                <Label x:Name="NoImageLabel" Text="{Binding UiTexts.PoiDetailNoImage}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#AAAAAA" FontSize="14" IsVisible="False"/>
             </Grid>
         </Border>
 
@@ -22,10 +22,11 @@
             <VerticalStackLayout Spacing="12">
                 <Label x:Name="DescLabel" TextColor="#D0D0D0" FontSize="14" LineBreakMode="WordWrap"/>
 
-                <Button x:Name="OpenMapsButton" Text="Mở trên Google Maps" BackgroundColor="#2A8F3A" TextColor="White" CornerRadius="10" Clicked="OnOpenMapsClicked"/>
+                <Button x:Name="OpenMapsButton" Text="{Binding UiTexts.PoiDetailOpenMaps}" BackgroundColor="#2A8F3A" TextColor="White" CornerRadius="10" Clicked="OnOpenMapsClicked"/>
 
-                <Button Text="Đóng" BackgroundColor="#2A2A3A" TextColor="#CCCCCC" CornerRadius="10" Clicked="OnCloseClicked"/>
+                <Button Text="{Binding UiTexts.CommonClose}" BackgroundColor="#2A2A3A" TextColor="#CCCCCC" CornerRadius="10" Clicked="OnCloseClicked"/>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
+
 </ContentPage>

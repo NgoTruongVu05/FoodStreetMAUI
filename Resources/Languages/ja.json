@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "languageCode": "ja",
+    "languageName": "日本語",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "自動ナレーション"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "自動ナレーション"
+    },
+    "language": {
+      "label": "言語:",
+      "modalTitle": "言語設定",
+      "systemLanguageLabel": "システム言語"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS未起動",
+      "startButton": "GPSを開始",
+      "stopButton": "GPSを停止",
+      "running": "GPS実行中...",
+      "error": "GPSエラー: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 POIリスト",
+      "poiListPageTitle": "POI一覧"
+    },
+    "legend": {
+      "you": "あなた",
+      "destination": "目的地",
+      "approaching": "接近中",
+      "nearest": "最も近い"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "訪問済み",
+      "distance": "距離",
+      "time": "時間",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 ナレーション再生中",
+      "stopButton": "⏹ 停止",
+      "waitingTitle": "POIアクティベーション待機中..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "詳細を表示",
+      "closeButton": "閉じる"
+    },
+    "nowPlayingModal": {
+      "closeButton": "閉じる"
+    },
+    "common": {
+      "close": "閉じる",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "QRコードをスキャン",
+    "scanHint": "QRコードをフレーム内に配置してスキャン",
+    "closeButton": "閉じる",
+    "cameraPermissionTitle": "カメラの許可",
+    "cameraPermissionMessage": "QRコードをスキャンするにはカメラの許可が必要です。"
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "{count}個のナレーションポイントを読み込みました",
+    "loadDataError": "データの読み込みエラー: {message}",
+    "loadLanguageError": "言語の読み込みエラー: {message}",
+    "languageChanged": "言語: {code}",
+    "teleportSuccess": "テレポート先: {poiName}",
+    "teleportError": "テレポートエラー: {message}",
+    "geofenceUpdateError": "ジオフェンス更新エラー: {message}",
+    "geofenceError": "ジオフェンスエラー: {message}",
+    "arrivedPrefix": "到着:",
+    "approachPrefix": "接近:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "±",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ 入場: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 接近: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ 出場: {name}"
+  },
+  "poi": {
+    "defaultCategory": "食べ物",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "ja",
+    "defaultLabel": "日本語"
+  },
+  "poiDetailPage": {
+    "title": "ポイント詳細",
+    "noImage": "画像なし",
+    "openMaps": "Google マップで開く"
+  }
+}

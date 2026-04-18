@@ -5,7 +5,6 @@
              xmlns:converters="clr-namespace:FoodStreetMAUI.Converters"
              x:Class="FoodStreetMAUI.Views.PoiListPage"
              x:Name="PoiListPageRoot"
-             Title="Điểm thuyết minh"
              BackgroundColor="#0F0F16">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -20,13 +19,13 @@
                 IsVisible="{Binding IsPlayingAudio}">
             <Grid ColumnDefinitions="*,Auto">
                 <VerticalStackLayout Grid.Column="0" Spacing="4">
-                    <Label Text="🔊 Đang phát thuyết minh" FontSize="10" TextColor="#F0A030"/>
+                    <Label Text="{Binding UiTexts.NowPlayingHeader}" FontSize="10" TextColor="#F0A030"/>
                     <Label Text="{Binding NowPlayingTitle}" FontSize="13" FontAttributes="Bold"
                            TextColor="#E8E0D0" LineBreakMode="TailTruncation"/>
                     <Label Text="{Binding NowPlayingDesc}" FontSize="11" TextColor="#999999"
                            LineBreakMode="TailTruncation" MaxLines="2"/>
                 </VerticalStackLayout>
-                <Button Grid.Column="1" Text="⏹ Dừng" FontSize="12" FontAttributes="Bold" VerticalOptions="Center"
+                <Button Grid.Column="1" Text="{Binding UiTexts.StopAudioButton}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center"
                         BackgroundColor="#E03030" TextColor="#FFFFFF"
                         HeightRequest="40" CornerRadius="8" Padding="12,0"
                         Command="{Binding StopAudioCommand}"/>
@@ -51,7 +50,7 @@
                                     <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                         <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="#D0D0E8"/>
                                     </VerticalStackLayout>
-                                    <Button Grid.Column="2" Text="🔊" FontSize="16"
+                                    <Button Grid.Column="2" Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UiTexts.PoiModalPlayButton}" FontSize="16"
                                             BackgroundColor="#F0A030" TextColor="#0F0F16"
                                             BorderColor="#F8C070" BorderWidth="1"
                                             CornerRadius="12" HeightRequest="36" WidthRequest="36"

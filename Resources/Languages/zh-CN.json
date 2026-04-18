@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "languageCode": "zh-CN",
+    "languageName": "简体中文",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "自动讲解"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "自动讲解"
+    },
+    "language": {
+      "label": "语言:",
+      "modalTitle": "语言设置",
+      "narrationLanguageLabel": "讲解语言",
+      "systemLanguageLabel": "系统语言"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS未启动",
+      "startButton": "启动GPS",
+      "stopButton": "停止GPS",
+      "running": "GPS正在运行...",
+      "error": "GPS错误: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 地点列表",
+      "poiListPageTitle": "地点列表"
+    },
+    "legend": {
+      "you": "你",
+      "destination": "目的地",
+      "approaching": "接近",
+      "nearest": "最近"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "已访问",
+      "distance": "距离",
+      "time": "时间",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 正在播放讲解",
+      "stopButton": "⏹ 停止",
+      "waitingTitle": "等待POI激活..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "查看详情",
+      "closeButton": "关闭"
+    },
+    "nowPlayingModal": {
+      "closeButton": "关闭"
+    },
+    "common": {
+      "close": "关闭",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "扫描二维码",
+    "scanHint": "将二维码放入框内扫描",
+    "closeButton": "关闭",
+    "cameraPermissionTitle": "摄像头权限",
+    "cameraPermissionMessage": "您需要授予摄像头权限才能扫描二维码。"
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "已加载{count}个讲解点",
+    "loadDataError": "加载数据错误: {message}",
+    "loadLanguageError": "加载语言错误: {message}",
+    "languageChanged": "语言: {code}",
+    "teleportSuccess": "传送到: {poiName}",
+    "teleportError": "传送错误: {message}",
+    "geofenceUpdateError": "地理围栏更新错误: {message}",
+    "geofenceError": "地理围栏错误: {message}",
+    "arrivedPrefix": "已到达:",
+    "approachPrefix": "接近:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "±",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ 进入: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 接近: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ 退出: {name}"
+  },
+  "poi": {
+    "defaultCategory": "美食",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "zh-CN",
+    "defaultLabel": "简体中文"
+  },
+  "poiDetailPage": {
+    "title": "点位详情",
+    "noImage": "无图片",
+    "openMaps": "在谷歌地图上打开"
+  }
+}

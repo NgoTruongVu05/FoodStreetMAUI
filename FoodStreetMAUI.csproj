@@ -21,6 +21,7 @@
     <MauiSplashScreen Include="Resources/Images/splashscreen.svg" Color="#0F0F16" BaseSize="128,128" />
     <MauiFont Include="Resources/Fonts/*" />
     <MauiImage Include="Resources/Images/*" Exclude="Resources/Images/appicon.svg;Resources/Images/splashscreen.svg" />
+    <MauiAsset Include="Resources/Languages/**/*.json" LogicalName="Languages/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

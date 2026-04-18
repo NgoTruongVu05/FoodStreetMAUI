@@ -24,6 +24,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AudioService>();
         builder.Services.AddSingleton<DataService>();
         builder.Services.AddSingleton<HeartbeatService>();
+        builder.Services.AddSingleton<UiTextService>();
 
         // ViewModel + View
         builder.Services.AddSingleton<MainViewModel>();

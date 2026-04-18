@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "languageCode": "vi",
+    "languageName": "Tiếng Việt",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "Thuyết minh tự động"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "Thuyết minh tự động"
+    },
+    "language": {
+      "label": "Ngôn ngữ:",
+      "modalTitle": "Cài đặt ngôn ngữ",
+      "narrationLanguageLabel": "Ngôn ngữ thuyết minh",
+      "systemLanguageLabel": "Ngôn ngữ hệ thống"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS chưa khởi động",
+      "startButton": "Bật GPS",
+      "stopButton": "Tắt GPS",
+      "running": "GPS thực đang hoạt động...",
+      "error": "Lỗi GPS: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 Danh sách điểm",
+      "poiListPageTitle": "Danh sách POI"
+    },
+    "legend": {
+      "you": "Bạn",
+      "destination": "Điểm đến",
+      "approaching": "Gần đến",
+      "nearest": "Gần nhất"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "Điểm thăm",
+      "distance": "Quãng đường",
+      "time": "Thời gian",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 Đang phát thuyết minh",
+      "stopButton": "⏹ Dừng",
+      "waitingTitle": "Chờ kích hoạt POI..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "Xem chi tiết",
+      "closeButton": "Đóng"
+    },
+    "nowPlayingModal": {
+      "closeButton": "Đóng"
+    },
+    "common": {
+      "close": "Đóng",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "Quét QR",
+    "scanHint": "Đưa mã QR vào khung để quét",
+    "closeButton": "Đóng",
+    "cameraPermissionTitle": "Quyền camera",
+    "cameraPermissionMessage": "Bạn cần cấp quyền camera để quét QR."
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "Đã tải {count} điểm thuyết minh",
+    "loadDataError": "Lỗi tải dữ liệu: {message}",
+    "loadLanguageError": "Lỗi tải ngôn ngữ: {message}",
+    "languageChanged": "Ngôn ngữ: {code}",
+    "teleportSuccess": "Teleport đến: {poiName}",
+    "teleportError": "Lỗi teleport: {message}",
+    "geofenceUpdateError": "Loi geofence update: {message}",
+    "geofenceError": "Loi geofence: {message}",
+    "arrivedPrefix": "DA DEN:",
+    "approachPrefix": "GAN DEN:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "+-",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ ENTER: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 APPROACH: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ EXIT: {name}"
+  },
+  "poi": {
+    "defaultCategory": "Ẩm thực",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "vi",
+    "defaultLabel": "Tiếng Việt"
+  },
+  "poiDetailPage": {
+    "title": "Chi tiết điểm",
+    "noImage": "Chưa có ảnh",
+    "openMaps": "Mở trên Google Maps"
+  }
+}

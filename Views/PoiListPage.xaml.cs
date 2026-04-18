@@ -5,11 +5,28 @@ namespace FoodStreetMAUI.Views;
 
 public partial class PoiListPage : ContentPage
 {
-    public PoiListPage(MainViewModel vm)
+    private MainViewModel? _vm;
+
+    public PoiListPage(MainViewModel? vm = null)
     {
         InitializeComponent();
-        BindingContext = vm;
+        _vm = vm;
+        if (vm != null)
+        {
+            BindingContext = vm;
+            // Cập nhật page title từ UiTexts
+            Title = vm.UiTexts.PoiListPageTitle;
+            // Subscribe để cập nhật title khi UiTexts thay đổi
+            vm.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.UiTexts))
+                {
+                    Title = vm.UiTexts.PoiListPageTitle;
+                }
+            };
+        }
     }
+
     private async void OnPoiTapped(object sender, TappedEventArgs e)
     {
         // Khi ấn vào một POI, mở modal chi tiết
@@ -23,7 +40,8 @@ public partial class PoiListPage : ContentPage
     public async System.Threading.Tasks.Task ShowPoiDetailAsync(Models.PointOfInterest poi)
     {
         //Gán nội dung POI vào POIDetail và Set biến isPoiModalVisible = true để hiển thị modal
-        var detail = new PoiDetailPage();
+        var vm = BindingContext as MainViewModel;
+        var detail = new PoiDetailPage(vm);
         detail.SetPoi(poi, (BindingContext as MainViewModel)?.CurrentLang ?? "vi");
         await Navigation.PushModalAsync(detail);
     }
@@ -43,9 +61,12 @@ public partial class PoiListPage : ContentPage
     {
         base.OnDisappearing();
 
-        if (BindingContext is MainViewModel vm)
+        // Khi quay lại MainPage (PopAsync), không ép dừng audio để tránh hiệu ứng phụ
+        // (ví dụ: reset trạng thái UI/ngôn ngữ do các handler liên quan audio).
+        // Chỉ dừng audio khi trang thật sự bị remove khỏi stack hoặc app chuyển trạng thái.
+        if (BindingContext is MainViewModel vm && Navigation?.NavigationStack?.Contains(this) == false)
         {
-            vm.StopAudio(); // gọi hàm dừng audio
+            vm.StopAudio();
         }
     }
 }

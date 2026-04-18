@@ -9,10 +9,19 @@ namespace FoodStreetMAUI.Views
     {
         private bool _handled;
         private readonly CameraBarcodeReaderView _qrReader;
+        private readonly UiTextService _uiTextService;
+        private readonly string _languageCode;
+        private readonly Label _hintLabel;
+        private readonly Button _closeButton;
 
-        public QrScanPage()
+        public QrScanPage(string? languageCode = null)
         {
-            Title = "Quét QR";
+            _uiTextService = new UiTextService();
+            _languageCode = string.IsNullOrWhiteSpace(languageCode)
+                ? (System.Globalization.CultureInfo.CurrentUICulture.Name ?? "vi")
+                : languageCode;
+
+            Title = "";
             BackgroundColor = Color.FromArgb("#0F0F16");
 
             _qrReader = new CameraBarcodeReaderView
@@ -29,16 +38,16 @@ namespace FoodStreetMAUI.Views
                 Content = _qrReader
             };
 
-            var closeButton = new Button
+            _closeButton = new Button
             {
-                Text = "Đóng",
+                Text = "",
                 Margin = new Thickness(0, 12, 0, 0),
                 BackgroundColor = Color.FromArgb("#2A2A3A"),
                 TextColor = Color.FromArgb("#CCCCCC"),
                 CornerRadius = 20,
                 HeightRequest = 44
             };
-            closeButton.Clicked += OnCloseClicked;
+            _closeButton.Clicked += OnCloseClicked;
 
             var root = new Grid
             {
@@ -51,20 +60,22 @@ namespace FoodStreetMAUI.Views
                 }
             };
 
-            root.Add(new Label
+            _hintLabel = new Label
             {
-                Text = "Đưa mã QR vào khung để quét",
+                Text = "",
                 FontSize = 14,
                 TextColor = Color.FromArgb("#E0E0F0"),
                 HorizontalOptions = LayoutOptions.Center,
                 Margin = new Thickness(0, 8, 0, 12)
-            });
+            };
+
+            root.Add(_hintLabel);
 
             root.Add(frame);
             Grid.SetRow(frame, 1);
 
-            root.Add(closeButton);
-            Grid.SetRow(closeButton, 2);
+            root.Add(_closeButton);
+            Grid.SetRow(_closeButton, 2);
 
             Content = root;
         }
@@ -72,6 +83,20 @@ namespace FoodStreetMAUI.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+
+            try
+            {
+                var t = await _uiTextService.LoadOrCreateQrScanPageTextsAsync(_languageCode);
+                Title = t.ScanTitle;
+                _hintLabel.Text = t.ScanHint;
+                _closeButton.Text = t.CloseButton;
+            }
+            catch
+            {
+                Title = "Quét QR";
+                _hintLabel.Text = "Đưa mã QR vào khung để quét";
+                _closeButton.Text = "Đóng";
+            }
 
             var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
             if (status != PermissionStatus.Granted)
@@ -81,7 +106,21 @@ namespace FoodStreetMAUI.Views
 
             if (status != PermissionStatus.Granted)
             {
-                await DisplayAlert("Quyền camera", "Bạn cần cấp quyền camera để quét QR.", "OK");
+                string title;
+                string message;
+                try
+                {
+                    var t = await _uiTextService.LoadOrCreateQrScanPageTextsAsync(_languageCode);
+                    title = t.CameraPermissionTitle;
+                    message = t.CameraPermissionMessage;
+                }
+                catch
+                {
+                    title = "Quyền camera";
+                    message = "Bạn cần cấp quyền camera để quét QR.";
+                }
+
+                await DisplayAlert(title, message, "OK");
                 await Navigation.PopAsync();
                 return;
             }

@@ -18,16 +18,17 @@ namespace FoodStreetMAUI.ViewModels
         private readonly AudioService _audio;
         private readonly DataService _data;
         private readonly LanguageService _languageService;
+        private readonly UiTextService _uiTextService;
 
         [ObservableProperty] string currentLang = "vi";
-        [ObservableProperty] string gpsStatusText = "GPS chưa khởi động";
+        [ObservableProperty] string gpsStatusText = string.Empty;
         [ObservableProperty] string coordinateText = "---";
         [ObservableProperty] string accuracyText = "";
         [ObservableProperty] bool isTracking = false;
         // simulation feature removed for production
         [ObservableProperty] bool isMuted = false;
         [ObservableProperty] float volume = 0.8f;
-        [ObservableProperty] string nowPlayingTitle = "Chờ kích hoạt POI...";
+        [ObservableProperty] string nowPlayingTitle = string.Empty;
         [ObservableProperty] string nowPlayingDesc = "";
         [ObservableProperty] string selectedPoiTitle = "";
         [ObservableProperty] string selectedPoiDesc = "";
@@ -35,6 +36,30 @@ namespace FoodStreetMAUI.ViewModels
         [ObservableProperty] bool isPlayingAudio = false;
         [ObservableProperty] bool isPoiModalVisible = false;
         [ObservableProperty] LanguageItem selectedLanguage;
+        private MainPageUiTexts uiTexts = new();
+        public MainPageUiTexts UiTexts
+        {
+            get => uiTexts;
+            set
+            {
+                if (SetProperty(ref uiTexts, value))
+                {
+                    ApplyUiTexts(value);
+                }
+            }
+        }
+        private string visitedSummaryText = string.Empty;
+        public string VisitedSummaryText
+        {
+            get => visitedSummaryText;
+            set => SetProperty(ref visitedSummaryText, value);
+        }
+        private LanguageItem selectedSystemLanguage = new LanguageItem("vi", "Tiếng Việt");
+        public LanguageItem SelectedSystemLanguage
+        {
+            get => selectedSystemLanguage;
+            set => SetProperty(ref selectedSystemLanguage, value);
+        }
         bool isNowPlayingModalVisible = false;
         public bool IsNowPlayingModalVisible
         {
@@ -63,14 +88,16 @@ namespace FoodStreetMAUI.ViewModels
         private System.Timers.Timer? _sessionTimer;
         private readonly object _locSync = new();
         private GpsCoordinate? _latestLocation;
+        private string _currentUiLanguageCode = "vi";
 
         public MainViewModel(GpsService gps, GeofenceService geo,
-                             AudioService audio, DataService data)
+                             AudioService audio, DataService data, UiTextService uiTextService)
         {
             _gps = gps;
             _geo = geo;
             _audio = audio;
             _data = data;
+            _uiTextService = uiTextService;
             _languageService = new LanguageService();
 
             _gps.LocationUpdated += OnLocationUpdated;
@@ -81,16 +108,40 @@ namespace FoodStreetMAUI.ViewModels
             _audio.StatusChanged += (s, m) =>
             {
                 AddLog(m);
-                if (m == "Phat xong")
-                {
-                    IsPlayingAudio = false;
-                }
+                // Không dựa vào chuỗi trạng thái (có thể khác ngôn ngữ / thay đổi theo UI texts).
+                // Đồng bộ trạng thái hiển thị dựa trên cờ IsPlaying của AudioService.
+                IsPlayingAudio = _audio.IsPlaying;
             };
             Pois.CollectionChanged += OnPoisCollectionChanged;
             SelectedLanguage = new LanguageItem(string.Empty, string.Empty);
+            SelectedSystemLanguage = new LanguageItem("vi", "Tiếng Việt");
+            ApplyUiTexts(UiTexts);
         }
 
         public event EventHandler? NearestPoiOrLocationChanged;
+
+        public async Task ChangeSystemUiLanguageAsync(string languageCode)
+        {
+            // Do NOT lowercase here; `UiTextService` expects region casing (e.g. `zh-CN`)
+            // to match packaged resource file names. Lowercasing can cause lookup to fail
+            // and fall back to `vi`.
+            var targetCode = string.IsNullOrWhiteSpace(languageCode) ? "vi" : languageCode.Trim();
+            if (string.Equals(targetCode, _currentUiLanguageCode, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            try
+            {
+                UiTexts = await _uiTextService.LoadOrCreateMainPageTextsAsync(targetCode);
+                _currentUiLanguageCode = targetCode;
+            }
+            catch
+            {
+                UiTexts = await _uiTextService.LoadOrCreateMainPageTextsAsync("vi");
+                _currentUiLanguageCode = "vi";
+            }
+        }
 
         private void OnPoisCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => NearestPoiOrLocationChanged?.Invoke(this, EventArgs.Empty);
@@ -100,6 +151,12 @@ namespace FoodStreetMAUI.ViewModels
         {
             try
             {
+                // Chỉ load UI texts lần đầu nếu chưa có ngôn ngữ UI nào được set.
+                if (string.IsNullOrWhiteSpace(_currentUiLanguageCode))
+                {
+                    await ChangeSystemUiLanguageAsync("vi");
+                }
+
                 var pois = await _data.LoadPoisAsync();
                 Pois.Clear();
                 _geo.ClearAll();
@@ -150,6 +207,7 @@ namespace FoodStreetMAUI.ViewModels
                     if (Languages.Count > 0)
                     {
                         SelectedLanguage = Languages.FirstOrDefault(l => l.Code == CurrentLang) ?? Languages[0];
+                        SelectedSystemLanguage = Languages.FirstOrDefault(l => l.Code == _currentUiLanguageCode) ?? Languages[0];
                     }
                 });
             }
@@ -169,7 +227,7 @@ namespace FoodStreetMAUI.ViewModels
                     _gps.StopTracking();
                     _sessionTimer?.Stop();
                     IsTracking = false;
-                    StartButtonText = "Bật GPS";
+                    StartButtonText = UiTexts.GpsStartButton;
                     StartButtonColor = "#1a3a1e";
                 }
                 else
@@ -178,7 +236,7 @@ namespace FoodStreetMAUI.ViewModels
                     StartSessionTimer();
                     await _gps.StartTrackingAsync();
                     IsTracking = true;
-                    StartButtonText = "Tắt GPS";
+                    StartButtonText = UiTexts.GpsStopButton;
                     StartButtonColor = "#3a1a1a";
                     AddLog("GPS thực đang hoạt động...");
                 }
@@ -190,10 +248,19 @@ namespace FoodStreetMAUI.ViewModels
         }
 
         [RelayCommand]
-        void SelectLanguage(string lang)
+        public async Task SelectLanguageAsync(string lang)
         {
-            CurrentLang = string.IsNullOrWhiteSpace(lang) ? "vi" : lang;
+            var targetLang = string.IsNullOrWhiteSpace(lang) ? "vi" : lang;
+            
+            // Nếu ngôn ngữ không thay đổi, không cần load lại
+            if (string.Equals(targetLang, CurrentLang, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            CurrentLang = targetLang;
             AddLog("Ngôn ngữ: " + CurrentLang.ToUpper());
+            
             // Nếu đang phát audio thì dừng và xóa thông tin hiển thị
             try
             {
@@ -201,7 +268,7 @@ namespace FoodStreetMAUI.ViewModels
             }
             catch { }
             IsPlayingAudio = false;
-            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingTitle = UiTexts.AudioWaitingTitle;
             NowPlayingDesc = "";
             SelectedPoi = null;
             IsNowPlayingModalVisible = false;
@@ -213,7 +280,7 @@ namespace FoodStreetMAUI.ViewModels
         {
             _audio.StopAll();
             IsPlayingAudio = false;
-            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingTitle = UiTexts.AudioWaitingTitle;
             NowPlayingDesc = "";
         }
 
@@ -449,7 +516,7 @@ namespace FoodStreetMAUI.ViewModels
             }
             catch { }
             IsPlayingAudio = false;
-            NowPlayingTitle = "Chờ kích hoạt POI...";
+            NowPlayingTitle = UiTexts.AudioWaitingTitle;
             NowPlayingDesc = "";
             SelectedPoi = null;
             IsNowPlayingModalVisible = false;
@@ -466,6 +533,28 @@ namespace FoodStreetMAUI.ViewModels
         void CloseLanguageModal()
         {
             IsLanguageModalVisible = false;
+        }
+
+        partial void OnVisitedCountChanged(int value)
+        {
+            UpdateVisitedSummaryText();
+        }
+
+        private void ApplyUiTexts(MainPageUiTexts texts)
+        {
+            GpsStatusText = texts.GpsStatusNotStarted;
+            StartButtonText = IsTracking ? texts.GpsStopButton : texts.GpsStartButton;
+            if (!IsPlayingAudio)
+            {
+                NowPlayingTitle = texts.AudioWaitingTitle;
+            }
+            UpdateVisitedSummaryText();
+        }
+
+        private void UpdateVisitedSummaryText()
+        {
+            var format = string.IsNullOrWhiteSpace(UiTexts?.StatsVisitedFormat) ? "🏛️ {0}" : UiTexts.StatsVisitedFormat;
+            VisitedSummaryText = format.Replace("{0}", VisitedCount.ToString());
         }
     }
 

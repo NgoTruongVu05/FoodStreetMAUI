@@ -10,10 +10,16 @@ namespace FoodStreetMAUI.Views
     public partial class PoiDetailPage : ContentPage
     {
         private PointOfInterest? _poi;
+        private MainViewModel? _vm;
 
-        public PoiDetailPage()
+        public PoiDetailPage(MainViewModel? vm = null)
         {
             InitializeComponent();
+            _vm = vm;
+            if (vm != null)
+            {
+                BindingContext = vm;
+            }
         }
 
         public void SetPoi(PointOfInterest poi, string lang)

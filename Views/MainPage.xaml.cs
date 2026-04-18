@@ -166,7 +166,8 @@ namespace FoodStreetMAUI.Views
 
         private async void OnScanQrClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new QrScanPage());
+            var systemLangCode = _vm?.SelectedSystemLanguage?.Code;
+            await Navigation.PushAsync(new QrScanPage(systemLangCode));
         }
 
         private void SetupMap()
@@ -224,7 +225,7 @@ namespace FoodStreetMAUI.Views
             }
         }
 
-        private void OnLanguagePickerChanged(object sender, EventArgs e)
+        private async void OnLanguagePickerChanged(object sender, EventArgs e)
         {
             //Flow: Kiểm tra ngôn ngữ hiện tại
             if (sender is not Picker picker || picker.SelectedItem is not LanguageItem language)
@@ -232,7 +233,17 @@ namespace FoodStreetMAUI.Views
                 return;
             }
 
-            _vm.SelectLanguageCommand.Execute(language.Code);
+            await _vm.SelectLanguageAsync(language.Code);
+        }
+
+        private async void OnSystemLanguagePickerChanged(object sender, EventArgs e)
+        {
+            if (sender is not Picker picker || picker.SelectedItem is not LanguageItem language)
+            {
+                return;
+            }
+
+            await _vm.ChangeSystemUiLanguageAsync(language.Code);
         }
 
         private MPoint? GetCenterMPoint()

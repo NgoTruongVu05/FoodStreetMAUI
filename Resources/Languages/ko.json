@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "languageCode": "ko",
+    "languageName": "한국어",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "자동 내레이션"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "자동 내레이션"
+    },
+    "language": {
+      "label": "언어:",
+      "modalTitle": "언어 설정",
+      "narrationLanguageLabel": "해설 언어",
+      "systemLanguageLabel": "시스템 언어"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS 미시작",
+      "startButton": "GPS 시작",
+      "stopButton": "GPS 중지",
+      "running": "GPS 실행 중...",
+      "error": "GPS 오류: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 POI 목록",
+      "poiListPageTitle": "POI 목록"
+    },
+    "legend": {
+      "you": "당신",
+      "destination": "목적지",
+      "approaching": "접근 중",
+      "nearest": "가장 가까운"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "방문함",
+      "distance": "거리",
+      "time": "시간",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 내레이션 재생 중",
+      "stopButton": "⏹ 중지",
+      "waitingTitle": "POI 활성화 대기 중..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "세부 정보 보기",
+      "closeButton": "닫기"
+    },
+    "nowPlayingModal": {
+      "closeButton": "닫기"
+    },
+    "common": {
+      "close": "닫기",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "QR 코드 스캔",
+    "scanHint": "프레임에 QR 코드를 배치하여 스캔",
+    "closeButton": "닫기",
+    "cameraPermissionTitle": "카메라 권한",
+    "cameraPermissionMessage": "QR 코드를 스캔하려면 카메라 권한을 부여해야 합니다."
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "{count}개의 내레이션 포인트 로드됨",
+    "loadDataError": "데이터 로드 오류: {message}",
+    "loadLanguageError": "언어 로드 오류: {message}",
+    "languageChanged": "언어: {code}",
+    "teleportSuccess": "텔레포트 위치: {poiName}",
+    "teleportError": "텔레포트 오류: {message}",
+    "geofenceUpdateError": "지오펜스 업데이트 오류: {message}",
+    "geofenceError": "지오펜스 오류: {message}",
+    "arrivedPrefix": "도착:",
+    "approachPrefix": "접근:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "±",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ 입장: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 접근: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ 퇴장: {name}"
+  },
+  "poi": {
+    "defaultCategory": "음식",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "ko",
+    "defaultLabel": "한국어"
+  },
+  "poiDetailPage": {
+    "title": "포인트 세부사항",
+    "noImage": "이미지 없음",
+    "openMaps": "Google 지도에서 열기"
+  }
+}

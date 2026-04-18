@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "languageCode": "en",
+    "languageName": "English",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "Automatic narration"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "Automatic narration"
+    },
+    "language": {
+      "label": "Language:",
+      "modalTitle": "Language Settings",
+      "systemLanguageLabel": "System Language"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS not started",
+      "startButton": "Start GPS",
+      "stopButton": "Stop GPS",
+      "running": "GPS is running...",
+      "error": "GPS Error: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 POI List",
+      "poiListPageTitle": "POI List"
+    },
+    "legend": {
+      "you": "You",
+      "destination": "Destination",
+      "approaching": "Approaching",
+      "nearest": "Nearest"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "Visited",
+      "distance": "Distance",
+      "time": "Time",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 Now Playing Narration",
+      "stopButton": "⏹ Stop",
+      "waitingTitle": "Waiting for POI activation..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "View Details",
+      "closeButton": "Close"
+    },
+    "nowPlayingModal": {
+      "closeButton": "Close"
+    },
+    "common": {
+      "close": "Close",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "Scan QR",
+    "scanHint": "Place QR code in frame to scan",
+    "closeButton": "Close",
+    "cameraPermissionTitle": "Camera Permission",
+    "cameraPermissionMessage": "You need to grant camera permission to scan QR."
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "Loaded {count} narration points",
+    "loadDataError": "Error loading data: {message}",
+    "loadLanguageError": "Error loading language: {message}",
+    "languageChanged": "Language: {code}",
+    "teleportSuccess": "Teleported to: {poiName}",
+    "teleportError": "Teleport error: {message}",
+    "geofenceUpdateError": "Geofence update error: {message}",
+    "geofenceError": "Geofence error: {message}",
+    "arrivedPrefix": "ARRIVED:",
+    "approachPrefix": "APPROACHING:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "±",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ ENTER: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 APPROACH: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ EXIT: {name}"
+  },
+  "poi": {
+    "defaultCategory": "Food",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "en",
+    "defaultLabel": "English"
+  },
+  "poiDetailPage": {
+    "title": "Point Details",
+    "noImage": "No Image",
+    "openMaps": "Open on Google Maps"
+  }
+}

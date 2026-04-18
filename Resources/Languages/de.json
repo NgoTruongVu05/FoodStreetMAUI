@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "languageCode": "de",
+    "languageName": "Deutsch",
+    "version": 1
+  },
+  "app": {
+    "title": "Food Street Guide",
+    "subtitle": "Automatische Erzählung"
+  },
+  "mainPage": {
+    "header": {
+      "title": "🍜 Food Street Guide",
+      "subtitle": "Automatische Erzählung"
+    },
+    "language": {
+      "label": "Sprache:",
+      "modalTitle": "Spracheinstellungen",
+      "narrationLanguageLabel": "Erzählsprache",
+      "systemLanguageLabel": "Systemsprache"
+    },
+    "gps": {
+      "icon": "📍",
+      "statusNotStarted": "GPS nicht gestartet",
+      "startButton": "GPS starten",
+      "stopButton": "GPS stoppen",
+      "running": "GPS läuft...",
+      "error": "GPS-Fehler: {message}"
+    },
+    "map": {
+      "centerButton": "📍",
+      "poiListButton": "📌 Interessenspunkte-Liste",
+      "poiListPageTitle": "Interessenspunkte"
+    },
+    "legend": {
+      "you": "Sie",
+      "destination": "Ziel",
+      "approaching": "Nähert sich",
+      "nearest": "Am nächsten"
+    },
+    "nearestPoi": {
+      "formatMeters": "{name} · {distance} m",
+      "formatKm": "{name} · {distance} km"
+    },
+    "stats": {
+      "visited": "Besucht",
+      "distance": "Entfernung",
+      "time": "Zeit",
+      "visitedFormat": "🏛️ {0}"
+    },
+    "audio": {
+      "nowPlayingHeader": "🔊 Erzählung läuft",
+      "stopButton": "⏹ Stoppen",
+      "waitingTitle": "Wartet auf POI-Aktivierung..."
+    },
+    "poiModal": {
+      "playButton": "🔊",
+      "viewDetailButton": "Details anzeigen",
+      "closeButton": "Schließen"
+    },
+    "nowPlayingModal": {
+      "closeButton": "Schließen"
+    },
+    "common": {
+      "close": "Schließen",
+      "dropdownArrow": "▼"
+    }
+  },
+  "qr": {
+    "scanTitle": "QR-Code scannen",
+    "scanHint": "QR-Code in den Rahmen legen zum Scannen",
+    "closeButton": "Schließen",
+    "cameraPermissionTitle": "Kameraberechtigung",
+    "cameraPermissionMessage": "Sie müssen die Kameraberechtigung erteilen, um QR-Codes zu scannen."
+  },
+  "deepLink": {
+    "scheme": "poiapp",
+    "poiDetailHost": "poi-detail",
+    "audioParam": "audio",
+    "idParam": "id"
+  },
+  "viewModel": {
+    "loadDataSuccess": "{count} Erzählungspunkte geladen",
+    "loadDataError": "Fehler beim Laden von Daten: {message}",
+    "loadLanguageError": "Fehler beim Laden der Sprache: {message}",
+    "languageChanged": "Sprache: {code}",
+    "teleportSuccess": "Teleportiert zu: {poiName}",
+    "teleportError": "Teleport-Fehler: {message}",
+    "geofenceUpdateError": "Geofence-Aktualisierungsfehler: {message}",
+    "geofenceError": "Geofence-Fehler: {message}",
+    "arrivedPrefix": "ANGEKOMMEN:",
+    "approachPrefix": "NÄHERT SICH:",
+    "distanceMetersSuffix": "m",
+    "distanceKmSuffix": "km",
+    "accuracyPrefix": "±",
+    "accuracySuffix": "m",
+    "distanceTextDefault": "0 m",
+    "sessionTimeDefault": "00:00"
+  },
+  "geofence": {
+    "enterLog": "✅ EINTRITT: {emoji} {name} ({distance}m)",
+    "approachLog": "📍 ANNÄHERUNG: {emoji} {name} ({distance}m)",
+    "exitLog": "↩️ AUSGANG: {name}"
+  },
+  "poi": {
+    "defaultCategory": "Lebensmittel",
+    "defaultEmoji": "🍜"
+  },
+  "languagePicker": {
+    "defaultCode": "de",
+    "defaultLabel": "Deutsch"
+  },
+  "poiDetailPage": {
+    "title": "Standort-Details",
+    "noImage": "Kein Bild",
+    "openMaps": "In Google Maps öffnen"
+  }
+}
