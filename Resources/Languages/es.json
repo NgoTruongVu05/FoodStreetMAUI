@@ -16,6 +16,7 @@
     "language": {
       "label": "Idioma:",
       "modalTitle": "Configuración de idioma",
+      "narrationLanguageLabel": "Idioma de narración",
       "systemLanguageLabel": "Idioma del sistema"
     },
     "gps": {

@@ -48,6 +48,20 @@ namespace FoodStreetMAUI.ViewModels
                 }
             }
         }
+        // Expose explicit properties for these labels so bindings update reliably
+        private string narrationLanguageLabel = "Ngôn ngữ thuyết minh";
+        public string NarrationLanguageLabel
+        {
+            get => narrationLanguageLabel;
+            set => SetProperty(ref narrationLanguageLabel, value);
+        }
+
+        private string systemLanguageLabel = "Ngôn ngữ hệ thống";
+        public string SystemLanguageLabel
+        {
+            get => systemLanguageLabel;
+            set => SetProperty(ref systemLanguageLabel, value);
+        }
         private string visitedSummaryText = string.Empty;
         public string VisitedSummaryText
         {
@@ -548,6 +562,9 @@ namespace FoodStreetMAUI.ViewModels
             {
                 NowPlayingTitle = texts.AudioWaitingTitle;
             }
+            // Update explicit label properties bound from XAML
+            NarrationLanguageLabel = texts.NarrationLanguageLabel ?? NarrationLanguageLabel;
+            SystemLanguageLabel = texts.SystemLanguageLabel ?? SystemLanguageLabel;
             UpdateVisitedSummaryText();
         }
 
